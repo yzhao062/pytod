@@ -12,7 +12,7 @@ from pyod.utils.utility import get_list_diff
 from itertools import combinations
 from ..utils.utility import Standardizer, get_batch_index
 
-from .basic_operators import cdist, bottomk
+from .basic_operators import cdist, cdist_cpu, bottomk, bottomk_cpu
 from mpmath import mp, mpf
 
 
@@ -154,9 +154,14 @@ def get_indices_clear_pairs(clear_pairs, sample_indice):
         torch.nonzero((clear_pairs[:, 0] == sample_indice), as_tuple=False), 1]
 
 
-def knn_full(A, B, k=5, p=2.0):
-    dist_c = cdist(A, B)
+def knn_full(A, B, k=5, p=2.0, device=None):
+    dist_c = cdist(A, B, p=p)
     btk_d, btk_i = bottomk(dist_c, k=k)
+    return btk_d, btk_i
+
+def knn_full_cpu(A, B, k=5, p=2.0):
+    dist_c = cdist_cpu(A, B, p=p)
+    btk_d, btk_i = bottomk_cpu(dist_c, k=k)
     return btk_d, btk_i
 
 

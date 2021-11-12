@@ -52,6 +52,8 @@ X_train, y_train, X_test, y_test = torch.from_numpy(X_train), \
 
 clf_name = 'KNN-PyTOD'
 clf = KNN(n_neighbors=k, batch_size=10000)
+# if GPU is not available, try the CPU version
+# clf = KNN(n_neighbors=k, batch_size=10000, device='cpu')
 start = time.time()
 clf.fit(X_train)
 end = time.time()

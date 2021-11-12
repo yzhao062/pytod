@@ -33,6 +33,13 @@ def cdist(a, b=None, p=2):
     else:
         return torch_cdist(a.cuda(), b.cuda(), p=p)
 
+def cdist_cpu(a, b=None, p=2):
+    if b is None:
+        b = a
+        return torch_cdist(b, b, p=p)
+    else:
+        return torch_cdist(a, b, p=p)
+
 
 # %%
 # a = torch.randn(50000, 200).cuda().half()
@@ -106,6 +113,14 @@ def bottomk(A, k, dim=1):
     # see parameter https://pytorch.org/docs/stable/generated/torch.topk.html
     tk = torch.topk(A.cuda(), k, dim=dim, largest=False)
     return tk[0].cpu(), tk[1].cpu()
+
+def bottomk_cpu(A, k, dim=1):
+    if len(A.shape) == 1:
+        dim = 0
+    # tk = torch.topk(A * -1, k, dim=dim)
+    # see parameter https://pytorch.org/docs/stable/generated/torch.topk.html
+    tk = torch.topk(A, k, dim=dim, largest=False)
+    return tk[0], tk[1]
 
 
 def bottomk_low_prec(A, k, dim=1, mode='half', sort_value=False):

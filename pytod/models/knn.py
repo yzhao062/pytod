@@ -9,7 +9,7 @@ import torch
 import numpy as np
 
 from .base import BaseDetector
-from .intermediate_layers import knn_full, knn_batch
+from .intermediate_layers import knn_full, knn_full_cpu, knn_batch
 
 
 class KNN(BaseDetector):
@@ -38,11 +38,19 @@ class KNN(BaseDetector):
         # X = check_array(X)
         self._set_n_classes(y)
 
-        if self.batch_size is None:
-            knn_dist, _ = knn_full(X, X, self.n_neighbors + 1)
+        if self.device == 'cpu':
+            # if self.batch_size is None:
+            knn_dist, _ = knn_full_cpu(X, X, self.n_neighbors + 1)
+            # else:
+            #     knn_dist, _ = knn_batch(X, X, self.n_neighbors + 1,
+            #                             batch_size=self.batch_size)
+
         else:
-            knn_dist, _ = knn_batch(X, X, self.n_neighbors + 1,
-                                    batch_size=self.batch_size)
+            if self.batch_size is None:
+                knn_dist, _ = knn_full(X, X, self.n_neighbors + 1)
+            else:
+                knn_dist, _ = knn_batch(X, X, self.n_neighbors + 1,
+                                        batch_size=self.batch_size)
 
         self.decision_scores_ = knn_dist[:, -1].cpu().numpy()
         self._process_decision_scores()
