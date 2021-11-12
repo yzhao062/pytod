@@ -18,9 +18,9 @@ from itertools import combinations
 # from basic_operators_batch import get_batch_index
 # check torch version
 
-print(torch.__version__)
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print(device, torch.cuda.get_device_name(torch.cuda.current_device()))
+# print(torch.__version__)
+# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# print(device, torch.cuda.get_device_name(torch.cuda.current_device()))
 
 # disable autograd
 torch.set_grad_enabled(False)

@@ -10,10 +10,9 @@ from pyod.utils.data import evaluate_print
 from pyod.utils.utility import get_list_diff
 
 from itertools import combinations
-from utility import Standardizer, get_batch_index
+from ..utils.utility import Standardizer, get_batch_index
 
-from basic_operators import cdist, bottomk
-from basic_operators_batch import cdist_batch
+from .basic_operators import cdist, bottomk
 from mpmath import mp, mpf
 
 

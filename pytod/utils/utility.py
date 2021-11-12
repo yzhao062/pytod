@@ -4,6 +4,7 @@
 # Author: Yue Zhao <zhaoy@cmu.edu>
 # License: BSD 2 clause
 
+import torch
 import sklearn
 from sklearn.metrics import precision_score
 from sklearn.preprocessing import StandardScaler
@@ -16,6 +17,58 @@ from sklearn.utils import column_or_1d
 from sklearn.utils import check_array
 from sklearn.utils import check_consistent_length
 
+
+def Standardizer(X_train, mean=None, std=None, return_mean_std=False):
+    if mean is None:
+        mean = torch.mean(X_train, axis=0)
+        std = torch.std(X_train, axis=0)
+        # print(mean.shape, std.shape)
+        assert (mean.shape[0] == X_train.shape[1])
+        assert (std.shape[0] == X_train.shape[1])
+
+    X_train_norm = (X_train - mean) / std
+    assert (X_train_norm.shape == X_train.shape)
+
+    if return_mean_std:
+        return X_train_norm, mean, std
+    else:
+        return X_train_norm
+
+
+def get_batch_index(n_samples, batch_size):
+    """Turning 1-dimensional space into equal chunk and return the index pairs.
+
+    Parameters
+    ----------
+    n_samples
+    batch_size
+
+    Returns
+    -------
+
+    """
+
+    if n_samples <= batch_size:
+        return [(0, n_samples)]
+
+    index_tracker = []
+    n_batches = int(np.ceil(n_samples // batch_size))
+    print('n_batches', n_batches)
+    tracker = 0
+    left_index, right_index = 0, 0
+    for i in range(n_batches):
+        left_index = tracker * batch_size
+        right_index = left_index + batch_size
+        tracker += 1
+        # print(left_index, right_index)
+        index_tracker.append((left_index, right_index))
+
+    if n_samples % batch_size != 0:
+        left_index = right_index
+        right_index = n_samples
+        # print(left_index, right_index)
+        index_tracker.append((left_index, right_index))
+    return index_tracker
 
 def get_label_n(y, y_pred, n=None):
     """Function to turn raw outlier scores into binary labels by assign 1
