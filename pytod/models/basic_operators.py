@@ -18,9 +18,9 @@ from itertools import combinations
 # from basic_operators_batch import get_batch_index
 # check torch version
 
-# print(torch.__version__)
-# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# print(device, torch.cuda.get_device_name(torch.cuda.current_device()))
+print(torch.__version__)
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print(device, torch.cuda.get_device_name(torch.cuda.current_device()))
 
 # disable autograd
 torch.set_grad_enabled(False)
@@ -39,6 +39,17 @@ def cdist(a, b=None, p=2):
 # b = torch.randn(20000, 200).cuda().half()
 
 def cdist_s(a, b):
+    """
+
+    Parameters
+    ----------
+    a
+    b
+
+    Returns
+    -------
+
+    """
     norm_a = torch.norm(a, dim=1).reshape(a.shape[0], 1)
     norm_b = torch.norm(b, dim=1).reshape(1, b.shape[0])
 
@@ -112,7 +123,7 @@ def bottomk_low_prec(A, k, dim=1, mode='half', sort_value=False):
     amb_indices_p1 = torch.where(bottomk_dist[:, k] <= bottomk_dist[:, k - 1])[
         0]
     amb_indices_m1 = \
-    torch.where(bottomk_dist[:, k - 2] >= bottomk_dist[:, k - 1])[0]
+        torch.where(bottomk_dist[:, k - 2] >= bottomk_dist[:, k - 1])[0]
 
     # there might be repetition, so we need to find the unique element only
     amb_indices = torch.unique(torch.cat((amb_indices_p1, amb_indices_m1)))
