@@ -96,7 +96,7 @@ If you need another reason: it can handle much larger datasets---more than **a m
 * `Implemented Algorithms <#implemented-algorithms>`_
 * `A Motivating Example PyOD vs. PyTOD <#a-motivating-example-pyod-vs-pytod>`_
 * `Programming Model Interface <#programming-model-interface>`_
-* `End-to-end Performance Comparison with PyOD <end-to-end-performance-comparison-with-pyod>`_
+* `End-to-end Performance Comparison with PyOD <#end-to-end-performance-comparison-with-pyod>`_
 
 ----
 
