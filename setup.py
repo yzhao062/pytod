@@ -5,7 +5,7 @@ from os import path
 from io import open  # for Python 2 and 3 compatibility
 
 # get __version__ from _version.py
-ver_file = path.join('combo', 'version.py')
+ver_file = path.join('pytod', 'version.py')
 with open(ver_file) as f:
     exec(f.read())
 
@@ -26,7 +26,7 @@ with open(path.join(this_directory, 'requirements.txt'),
 setup(
     name='pytod',
     version=__version__,
-    description='Tensor-based outlier detection. A general acceleration framework.',
+    description='Tensor-based outlier detection. A general GPU-accelerated framework.',
     long_description=readme(),
     long_description_content_type='text/x-rst',
     author='Yue Zhao',
