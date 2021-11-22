@@ -94,9 +94,9 @@ If you need another reason: it can handle much larger datasets---more than **a m
 
 * `Installation <#installation>`_
 * `Implemented Algorithms <#implemented-algorithms>`_
-* `A Motivating Example PyOD vs. PyTOD <#a-motivating-example-pyod-vs--pytod>`_
+* `A Motivating Example PyOD vs. PyTOD <#a-motivating-example-pyod-vs-pytod>`_
 * `Programming Model Interface <#programming-model-interface>`_
-* `End-to-end Performance Comparison with PyOD <end--to--end-performance-comparison-with-pyod>`_
+* `End-to-end Performance Comparison with PyOD <end-to-end-performance-comparison-with-pyod>`_
 
 ----
 
@@ -127,6 +127,34 @@ Alternatively, you could clone and run setup.py file:
 * pytorch>=1.7 (it is safer if you install by yourself)
 * scipy>=0.19.1
 * scikit_learn>=0.20.0
+
+----
+
+
+Implemented Algorithms
+^^^^^^^^^^^^^^^^^^^^^^
+
+PyTOD toolkit consists of three major functional groups (to be cleaned up):
+
+**(i) Individual Detection Algorithms** :
+
+===================  ==================  ======================================================================================================  =====  ========================================
+Type                 Abbr                Algorithm                                                                                               Year   Ref
+===================  ==================  ======================================================================================================  =====  ========================================
+Linear Model         PCA                 Principal Component Analysis (the sum of weighted projected distances to the eigenvector hyperplanes)   2003   [#Shyu2003A]_
+Proximity-Based      LOF                 Local Outlier Factor                                                                                    2000   [#Breunig2000LOF]_
+Proximity-Based      COF                 Connectivity-Based Outlier Factor                                                                       2002   [#Tang2002Enhancing]_
+Proximity-Based      HBOS                Histogram-based Outlier Score                                                                           2012   [#Goldstein2012Histogram]_
+Proximity-Based      kNN                 k Nearest Neighbors (use the distance to the kth nearest neighbor as the outlier score)                 2000   [#Ramaswamy2000Efficient]_
+Proximity-Based      AvgKNN              Average kNN (use the average distance to k nearest neighbors as the outlier score)                      2002   [#Angiulli2002Fast]_
+Proximity-Based      MedKNN              Median kNN (use the median distance to k nearest neighbors as the outlier score)                        2002   [#Angiulli2002Fast]_
+Probabilistic        ABOD                Angle-Based Outlier Detection                                                                           2008   [#Kriegel2008Angle]_
+Probabilistic        COPOD               COPOD: Copula-Based Outlier Detection                                                                   2020   [#Li2020COPOD]_
+Probabilistic        FastABOD            Fast Angle-Based Outlier Detection using approximation                                                  2008   [#Kriegel2008Angle]_
+===================  ==================  ======================================================================================================  =====  ========================================
+
+
+**Code is being released**. Watch and star for the latest news!
 
 
 ----
@@ -209,34 +237,6 @@ Overall, it is much (on avg. 11 times) faster than PyOD takes way less run time.
 
 .. image:: https://raw.githubusercontent.com/yzhao062/pytod/master/figs/run_time.png
    :target: https://raw.githubusercontent.com/yzhao062/pytod/master/figs/run_time.png
-
-
-----
-
-Implemented Algorithms
-^^^^^^^^^^^^^^^^^^^^^^
-
-PyTOD toolkit consists of three major functional groups (to be cleaned up):
-
-**(i) Individual Detection Algorithms** :
-
-===================  ==================  ======================================================================================================  =====  ========================================
-Type                 Abbr                Algorithm                                                                                               Year   Ref
-===================  ==================  ======================================================================================================  =====  ========================================
-Linear Model         PCA                 Principal Component Analysis (the sum of weighted projected distances to the eigenvector hyperplanes)   2003   [#Shyu2003A]_
-Proximity-Based      LOF                 Local Outlier Factor                                                                                    2000   [#Breunig2000LOF]_
-Proximity-Based      COF                 Connectivity-Based Outlier Factor                                                                       2002   [#Tang2002Enhancing]_
-Proximity-Based      HBOS                Histogram-based Outlier Score                                                                           2012   [#Goldstein2012Histogram]_
-Proximity-Based      kNN                 k Nearest Neighbors (use the distance to the kth nearest neighbor as the outlier score)                 2000   [#Ramaswamy2000Efficient]_
-Proximity-Based      AvgKNN              Average kNN (use the average distance to k nearest neighbors as the outlier score)                      2002   [#Angiulli2002Fast]_
-Proximity-Based      MedKNN              Median kNN (use the median distance to k nearest neighbors as the outlier score)                        2002   [#Angiulli2002Fast]_
-Probabilistic        ABOD                Angle-Based Outlier Detection                                                                           2008   [#Kriegel2008Angle]_
-Probabilistic        COPOD               COPOD: Copula-Based Outlier Detection                                                                   2020   [#Li2020COPOD]_
-Probabilistic        FastABOD            Fast Angle-Based Outlier Detection using approximation                                                  2008   [#Kriegel2008Angle]_
-===================  ==================  ======================================================================================================  =====  ========================================
-
-
-**Code is being released**. Watch and star for the latest news!
 
 
 ----
