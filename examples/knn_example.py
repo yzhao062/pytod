@@ -14,6 +14,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname("__file__"), '..')))
 
 from pytod.models.knn import KNN
+from pytod.utils.utility import validate_device
 
 contamination = 0.1  # percentage of outliers
 n_train = 30000  # number of training points
@@ -41,22 +42,19 @@ y_train_scores = clf.decision_scores_  # raw outlier scores
 # evaluate and print the results
 print("\nOn Training Data:")
 evaluate_print(clf_name, y_train, y_train_scores)
-print('Execution time', end-start)
-
-
+print('Execution time', end - start)
 
 X_train, y_train, X_test, y_test = torch.from_numpy(X_train), \
                                    torch.from_numpy(y_train), \
                                    torch.from_numpy(X_test), \
                                    torch.from_numpy(y_test)
 
-
 print()
 print()
+# try to access the GPU, fall back to cpu if no gpu is available
+device = validate_device(0)
 clf_name = 'KNN-PyTOD'
-clf = KNN(n_neighbors=k, batch_size=10000)
-# if GPU is not available, try the CPU version
-# clf = KNN(n_neighbors=k, batch_size=10000, device='cpu')
+clf = KNN(n_neighbors=k, batch_size=10000, device=device)
 start = time.time()
 clf.fit(X_train)
 end = time.time()
@@ -67,4 +65,4 @@ y_train_scores = clf.decision_scores_  # raw outlier scores
 # evaluate and print the results
 print("\nOn Training Data:")
 evaluate_print(clf_name, y_train, y_train_scores)
-print('Execution time', end-start)
+print('Execution time', end - start)
