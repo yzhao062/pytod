@@ -1,4 +1,6 @@
 prune examples
-prune combo/test
+prune pytod/test
+prune figs
+prune reproducibility
 include README.rst
 include requirements.txt

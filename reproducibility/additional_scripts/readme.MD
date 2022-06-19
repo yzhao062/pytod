@@ -1,0 +1,1 @@
+We are cleaning up these scripts for easy run, while the primary results are reproducible with the compare_real_data.py

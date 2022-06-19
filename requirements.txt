@@ -3,3 +3,4 @@ pytorch>=1.7
 scipy
 scikit_learn>=0.20
 mpmath
+pyod
