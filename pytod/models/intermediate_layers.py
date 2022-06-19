@@ -155,14 +155,29 @@ def get_indices_clear_pairs(clear_pairs, sample_indice):
 
 
 def knn_full(A, B, k=5, p=2.0, device=None):
-    dist_c = cdist(A, B, p=p)
-    btk_d, btk_i = bottomk(dist_c, k=k)
-    return btk_d, btk_i
+    """Get kNN in the non-batch way
 
-def knn_full_cpu(A, B, k=5, p=2.0):
-    dist_c = cdist_cpu(A, B, p=p)
-    btk_d, btk_i = bottomk_cpu(dist_c, k=k)
-    return btk_d, btk_i
+    Parameters
+    ----------
+    A
+    B
+    k
+    p
+    device
+
+    Returns
+    -------
+
+    """
+    dist_c = cdist(A.to(device), B.to(device), p=p)
+    btk_d, btk_i = bottomk(dist_c, k=k)
+    return btk_d.cpu(), btk_i.cpu()
+
+
+# def knn_full_cpu(A, B, k=5, p=2.0):
+#     dist_c = cdist_cpu(A, B, p=p)
+#     btk_d, btk_i = bottomk_cpu(dist_c, k=k)
+#     return btk_d, btk_i
 
 
 def knn_batch_intermediate(A, B, k=5, p=2.0, batch_size=None):
@@ -225,8 +240,10 @@ def get_knn_from_intermediate(intermediate_knn, k):
     return knn_dist, knn_inds
 
 
-def knn_batch(A, B, k=5, p=2.0, batch_size=None):
-    intermediate_knn = knn_batch_intermediate(A, B, k, p, batch_size)
+def knn_batch(A, B, k=5, p=2.0, batch_size=None, device='cpu'):
+    if batch_size is None:
+        return knn_full(A, B, k, p, device)
+    intermediate_knn = knn_batch_intermediate(A.to(device), B.to(device), k, p, batch_size)
     return get_knn_from_intermediate(intermediate_knn, k)
 
 
@@ -234,37 +251,5 @@ def get_cosine_similarity(input1, input2, use_cuda=False):
     # todo: fix use cuda 
     # torch.sum(nn_1* nn_2, dim=1) / (torch.linalg.norm(nn_1, dim=1)**2 * torch.linalg.norm(nn_2, dim=1)**2)
     return torch.sum(input1 * input2, dim=1) / (
-                torch.linalg.norm(input1, dim=1) ** 2 *
-                torch.linalg.norm(input2, dim=1) ** 2)
-
-# n_train = 20000  # number of training points
-# n_features = 100
-# batch_size = 10000
-# p = 2
-# k = 5
-
-# # # Generate sample data
-# # # X_train = torch.randn([n_train, n_features]).half()
-# # # X_train = torch.randn([n_train, n_features])
-# A = torch.randn([n_train, n_features])
-# # # X_train_norm = Standardizer(X_train, return_mean_std=False)
-# B = A
-
-
-# # intermediate_knn = knn_batch_intermediate(A, B, k, batch_size=batch_size)
-# # knn_dist, knn_inds = get_knn_from_intermediate(intermediate_knn, k)
-
-# knn_dist, knn_inds = knn_batch(A, B, k, batch_size=batch_size)
-
-# %%
-
-# btk_d, btk_i = knn_full(A, B, k)
-
-# non_equal = torch.nonzero(btk_d!=knn_dist, as_tuple=False)
-# non_equal_ind = torch.nonzero(btk_i!=knn_inds, as_tuple=False)
-
-# # make sure the indices are the same for
-# assert (non_equal_ind.shape[0] == 0)
-# # # it is wiered though.
-# # for i in range(non_equal.shape[0]):
-# #     print(non_equal[i], btk_d[non_equal[i][0], non_equal[i][1]], knn_dist[non_equal[i][0], non_equal[i][1]])
+            torch.linalg.norm(input1, dim=1) ** 2 *
+            torch.linalg.norm(input2, dim=1) ** 2)

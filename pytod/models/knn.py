@@ -1,6 +1,6 @@
-"""Copula Based Outlier Detector (COPOD)
+# -*- coding: utf-8 -*-
+"""k-Nearest Neighbors Detector (kNN)
 """
-# Author: Zheng Li <jk_zhengli@hotmail.com>
 # Author: Yue Zhao <zhaoy@cmu.edu>
 # License: BSD 2 clause
 
@@ -9,7 +9,7 @@ import torch
 import numpy as np
 
 from .base import BaseDetector
-from .intermediate_layers import knn_full, knn_full_cpu, knn_batch
+from .intermediate_layers import knn_batch
 
 
 class KNN(BaseDetector):
@@ -38,19 +38,9 @@ class KNN(BaseDetector):
         # X = check_array(X)
         self._set_n_classes(y)
 
-        if self.device == 'cpu':
-            # if self.batch_size is None:
-            knn_dist, _ = knn_full_cpu(X, X, self.n_neighbors + 1)
-            # else:
-            #     knn_dist, _ = knn_batch(X, X, self.n_neighbors + 1,
-            #                             batch_size=self.batch_size)
-
-        else:
-            if self.batch_size is None:
-                knn_dist, _ = knn_full(X, X, self.n_neighbors + 1)
-            else:
-                knn_dist, _ = knn_batch(X, X, self.n_neighbors + 1,
-                                        batch_size=self.batch_size)
+        knn_dist, _ = knn_batch(X, X, self.n_neighbors + 1,
+                                batch_size=self.batch_size,
+                                device=self.device)
 
         self.decision_scores_ = knn_dist[:, -1].cpu().numpy()
         self._process_decision_scores()
