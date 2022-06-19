@@ -218,7 +218,7 @@ Paper Reproducibility
 
 **Datasets**: OD benchmark datasets are available at `datasets folder <https://github.com/yzhao062/pytod/tree/main/reproducibility/datasets/ODDS>`_.
 
-**Scripts for reproducibility is available in** `datasets folder <https://github.com/yzhao062/pytod/tree/main/reproducibility>`_.
+**Scripts for reproducibility is available in** `reproducibility folder <https://github.com/yzhao062/pytod/tree/main/reproducibility>`_.
 
 Cleanup is on the way!
 
