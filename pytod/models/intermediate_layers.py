@@ -12,7 +12,7 @@ from pyod.utils.utility import get_list_diff
 from itertools import combinations
 from ..utils.utility import Standardizer, get_batch_index
 
-from .basic_operators import cdist, cdist_cpu, bottomk, bottomk_cpu
+from .basic_operators import cdist, bottomk
 from mpmath import mp, mpf
 
 

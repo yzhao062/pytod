@@ -1,39 +1,30 @@
 # -*- coding: utf-8 -*-
+"""Implementation of some basic operators.
 """
-Created on Thu Jan 14 21:44:34 2021
+# Author: Yue Zhao <zhaoy@cmu.edu>
+# License: BSD 2 clause
 
-@author: yuezh
-"""
 
-import time
-import numpy as np
 import torch
 from torch import cdist as torch_cdist
 
-# from pyod.utils.data import generate_data
-# from pyod.utils.data import evaluate_print
-
-from itertools import combinations
-
-# from basic_operators_batch import get_batch_index
-# check torch version
-
-# print(torch.__version__)
-# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# print(device, torch.cuda.get_device_name(torch.cuda.current_device()))
-
-# disable autograd
+# disable autograd since no grad is needed
 torch.set_grad_enabled(False)
 
 
 def cdist(a, b=None, p=2):
-    if b is None:
-        b = a.cuda()
-        return torch_cdist(b, b, p=p)
-    else:
-        return torch_cdist(a.cuda(), b.cuda(), p=p)
+    """Basic cdist without using batching
 
-def cdist_cpu(a, b=None, p=2):
+    Parameters
+    ----------
+    a
+    b
+    p
+
+    Returns
+    -------
+
+    """
     if b is None:
         b = a
         return torch_cdist(b, b, p=p)
@@ -41,12 +32,8 @@ def cdist_cpu(a, b=None, p=2):
         return torch_cdist(a, b, p=p)
 
 
-# %%
-# a = torch.randn(50000, 200).cuda().half()
-# b = torch.randn(20000, 200).cuda().half()
-
 def cdist_s(a, b):
-    """
+    """Memory saving version of cdist
 
     Parameters
     ----------
@@ -62,23 +49,6 @@ def cdist_s(a, b):
 
     w = norm_a ** 2 + norm_b ** 2 - 2 * torch.matmul(a, b.T)
     return torch.sqrt(w)
-
-
-# print(a)
-# print(b)
-
-# w = cdist_s(a,b)
-# print(w)
-# p = cdist(a,b)
-# print(p)
-
-# %%
-# topk and bottoml be both batched!
-# from pytorch_memlab import LineProfiler
-# from pytorch_memlab import MemReporter
-import torch
-
-import time
 
 
 def topk(A, k, dim=1):
@@ -113,6 +83,7 @@ def bottomk(A, k, dim=1):
     # see parameter https://pytorch.org/docs/stable/generated/torch.topk.html
     tk = torch.topk(A.cuda(), k, dim=dim, largest=False)
     return tk[0].cpu(), tk[1].cpu()
+
 
 def bottomk_cpu(A, k, dim=1):
     if len(A.shape) == 1:
@@ -276,17 +247,6 @@ def post_check_intersection1d(t1, t2, intersect):
             assert ('intersection error')
 
 
-# t1 = torch.tensor([1, 24, 1, 25, 0.12, 0.00000000012022202]).cuda().double()
-# t2 = torch.tensor([0.12, 1, 9, 12, 5, 24, 25, 25, 0.00000000012022204]).cuda().double()
-
-# a = intersec1d(t1.half(), t2.half())
-# print(a)
-
-
-# post_check_intersection1d(t1, t2, a)
-
-# %%
-
 def svd_randomized(M, k=10):
     # http://gregorygundersen.com/blog/2019/01/17/randomized-svd/
     # http://algorithm-interest-group.me/assets/slides/randomized_SVD.pdf
@@ -301,15 +261,6 @@ def svd_randomized(M, k=10):
     return U, S, V
 
 
-# M = torch.randn(10000, 500).float().cuda()
-# k = 10
-
-# U, S, V = svd_randomized(M, k)
-# print(U.shape, S.shape, V.shape)
-# print(torch.dist(M, torch.mm(torch.mm(U, torch.diag(S)), V.T)))
-# print()
-
-# %%
 def histt(a, bins=10, density=True):
     def diff(a):
         # https://discuss.pytorch.org/t/equivalent-function-like-numpy-diff-in-pytorch/35327
@@ -328,34 +279,3 @@ def histt(a, bins=10, density=True):
 
     else:
         return hist, bin_edges
-
-# # a = torch.tensor([[1,2,3,4,5,2,3], [12,3, 0, 4,1,2,3]]).cuda().T
-# A = torch.randn(5000000, 10).cuda()
-# B = A.cpu()
-# start = time.time()
-# for i in range(A.shape[1]):
-#     histt(A[:, i])
-# # print(histt(a[:, 0]))
-# # print(histt(a[:, 1]))
-# end = time.time()
-# print(end - start)
-
-# start = time.time()
-# for i in range(B.shape[1]):
-#     np.histogram(B[:, i])
-# # print(histt(a[:, 0]))
-# # print(histt(a[:, 1]))
-# end = time.time()
-# print(end - start)
-
-# %%
-# n = 100
-# k = 10
-
-# rand_list = torch.randperm(n)
-# print(rand_list[:k])
-
-
-# todo
-# add cosine similarity
-# https://stackoverflow.com/questions/50411191/how-to-compute-the-cosine-similarity-in-pytorch-for-all-rows-in-a-matrix-with-re
