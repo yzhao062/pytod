@@ -1,5 +1,5 @@
 numpy>=1.13
-pytorch>=1.7
+torch>=1.7
 scipy
 scikit_learn>=0.20
 mpmath
