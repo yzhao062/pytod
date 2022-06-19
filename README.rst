@@ -124,9 +124,10 @@ Alternatively, you could clone and run setup.py file:
 
 * Python 3.6+
 * numpy>=1.13
-* pytorch>=1.7 (it is safer if you install by yourself)
+* torch>=1.7 (**it is safer if you install by yourself**)
 * scipy>=0.19.1
 * scikit_learn>=0.20.0
+* pyod (**for comparison**)
 
 ----
 
