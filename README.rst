@@ -35,9 +35,7 @@ A key idea behind TOD is *decomposing OD applications into basic tensor algebra 
 `Prof. George Chen <http://www.andrew.cmu.edu/user/georgech/>`_, and `Prof. Zhihao Jia <https://cs.cmu.edu/~zhihaoj2>`_.
 **The code is being cleaned up and released. Please watch and star!**
 
-**Citing TOD**\ :
-
-Check out `the design paper <https://www.andrew.cmu.edu/user/yuezhao2/papers/22-preprint-tod.pdf>`_.
+**Citing TOD**\ : Check out `the design paper <https://www.andrew.cmu.edu/user/yuezhao2/papers/22-preprint-tod.pdf>`_.
 If you use TOD in a scientific publication, we would appreciate
 citations to the following paper::
 
@@ -96,6 +94,7 @@ If you need another reason: it can handle much larger datasets---more than **a m
 * `Installation <#installation>`_
 * `Implemented Algorithms <#implemented-algorithms>`_
 * `A Motivating Example PyOD vs. PyTOD <#a-motivating-example-pyod-vs-pytod>`_
+* `Paper Reproducibility <#paper-reproducibility>`_
 * `Programming Model Interface <#programming-model-interface>`_
 * `End-to-end Performance Comparison with PyOD <#end-to-end-performance-comparison-with-pyod>`_
 
@@ -211,6 +210,13 @@ shows that how fast and how easy PyTOD is. Take the famous kNN outlier detection
       Execution time 3.36 seconds
 
 It is easy to see, PyTOD shows both better efficiency than PyOD.
+
+----
+
+Paper Reproducibility
+^^^^^^^^^^^^^^^^^^^^^
+
+**Datasets**: OD benchmark datasets are available at `datasets folder <https://github.com/yzhao062/pytod/tree/main/reproducibility/datasets/ODDS>`_
 
 ----
 
