@@ -261,20 +261,20 @@ def svd_randomized(M, k=10):
     return U, S, V
 
 
-def histt(a, bins=10, density=True):
+def histt(a, bins=10, density=True, device='cpu'):
     def diff(a):
         # https://discuss.pytorch.org/t/equivalent-function-like-numpy-diff-in-pytorch/35327
         return a[1:] - a[:-1]
 
     # https://github.com/numpy/numpy/blob/v1.19.0/numpy/lib/histograms.py#L677-L928
     # for i in range(a.shape[1]):
-    hist = torch.histc(a.cuda(), bins=bins)
+    hist = torch.histc(a, bins=bins)
     # normalize histogram to sum to 1
     # hist = torch.true_divide(hist, hist.sum())
-    bin_edges = torch.linspace(a.min(), a.max(), steps=bins + 1)
+    bin_edges = torch.linspace(a.min(), a.max(), steps=bins + 1).to(device)
     if density:
         hist_sum = hist.sum()
-        db = diff(bin_edges).cuda()
+        db = diff(bin_edges).to(device)
         return torch.true_divide(hist, db) / hist_sum, bin_edges
 
     else:
