@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""Example of using Angle-base outlier detection (ABOD) for outlier detection
+"""
+# Author: Yue Zhao <zhaoy@cmu.edu>
+# License: BSD 2 clause
+
 import torch
 from pyod.models.abod import ABOD as ABOD_PyOD
 from pyod.utils.data import generate_data

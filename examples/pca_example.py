@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Example of using kNN for outlier detection
+"""Example of using PCA for outlier detection
 """
 # Author: Yue Zhao <zhaoy@cmu.edu>
 # License: BSD 2 clause
-
 import torch
-from pyod.models.knn import KNN as KNN_PyOD
+from pyod.models.pca import PCA as PCA_PyOD
 from pyod.utils.data import generate_data
 from pyod.utils.data import evaluate_print
 
@@ -18,13 +17,13 @@ import time
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname("__file__"), '..')))
 
-from pytod.models.knn import KNN
+from pytod.models.pca import PCA
 from pytod.utils.utility import validate_device
 
 contamination = 0.1  # percentage of outliers
-n_train = 30000  # number of training points
+n_train = 1000000  # number of training points
 n_test = 5000  # number of testing points
-n_features = 20
+n_features = 200
 k = 10
 
 # Generate sample data
@@ -35,8 +34,8 @@ X_train, y_train, X_test, y_test = \
                   contamination=contamination,
                   random_state=42)
 
-clf_name = 'KNN-PyOD'
-clf = KNN_PyOD(n_neighbors=k)
+clf_name = 'PCA-PyOD'
+clf = PCA_PyOD(n_components=5)
 start = time.time()
 clf.fit(X_train)
 end = time.time()
@@ -48,7 +47,7 @@ y_train_scores = clf.decision_scores_  # raw outlier scores
 print("\nOn Training Data:")
 evaluate_print(clf_name, y_train, y_train_scores)
 pyod_time = end - start
-print('Execution time', end - start)
+print('PyOD execution time', pyod_time)
 
 X_train, y_train, X_test, y_test = torch.from_numpy(X_train), \
                                    torch.from_numpy(y_train), \
@@ -59,10 +58,10 @@ print()
 print()
 # try to access the GPU, fall back to cpu if no gpu is available
 device = validate_device(0)
-device = 'cpu'
-clf_name = 'KNN-PyTOD'
-# clf = KNN(n_neighbors=k, batch_size=10000, device=device)
-clf = KNN(n_neighbors=k, batch_size=None, device=device)
+# device = 'cpu'
+clf_name = 'PCA-PyTOD'
+clf = PCA(n_components=k, device=device)
+# clf = PCA(n_neighbors=k, batch_size=None, device=device)
 start = time.time()
 clf.fit(X_train)
 end = time.time()
@@ -74,6 +73,6 @@ y_train_scores = clf.decision_scores_  # raw outlier scores
 print("\nOn Training Data:")
 evaluate_print(clf_name, y_train, y_train_scores)
 tod_time = end - start
-print('Execution time', end - start)
+print('TOD execution time', tod_time)
 
 print('TOD is', round(pyod_time / tod_time, ndigits=2), 'times faster than PyOD')

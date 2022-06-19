@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""Example of using LOF for outlier detection
+"""
+# Author: Yue Zhao <zhaoy@cmu.edu>
+# License: BSD 2 clause
+
 import torch
 from pyod.models.lof import LOF as LOF_PyOD
 from pyod.utils.data import generate_data
