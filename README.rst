@@ -1,5 +1,5 @@
-(Py)TOD: Tensor-based Outlier Detection, A General GPU-Accelerated Framework
-============================================================================
+(Py)TOD: GPU-accelerated Outlier Detection via Tensor Operations
+================================================================
 
 
 **Deployment & Documentation & Stats & License**
@@ -28,21 +28,22 @@
 
 **Background**: Outlier detection (OD) is a key data mining task for identifying abnormal objects from general samples with numerous high-stake applications including fraud detection and intrusion detection.
 
-To scale outlier detection (OD) to large-scale, high-dimensional datasets, we propose **TOD**, a novel system that abstracts OD algorithms into basic tensor operations for efficient GPU acceleration.
+We propose **TOD**, a system for efficient and scalable outlier detection (OD) on distributed multi-GPU machines.
+A key idea behind TOD is *decomposing OD applications into basic tensor algebra operations for GPU acceleration*.
 
-**Development team**: TOD is developed by the same author(s) of PyOD. Specifically, `Yue Zhao <https://www.andrew.cmu.edu/user/yuezhao2/>`_,
-`Prof. George Chen <http://www.andrew.cmu.edu/user/georgech/>`_, and `Prof. Zhihao Jia <https://cs.cmu.edu/~zhihaoj2>`_ from CMU design, implement, and maintain TOD.
+**Authors**: TOD is developed by the same author(s) of the popular PyOD and PyGOD. Specifically, `Yue Zhao <https://www.andrew.cmu.edu/user/yuezhao2/>`_,
+`Prof. George Chen <http://www.andrew.cmu.edu/user/georgech/>`_, and `Prof. Zhihao Jia <https://cs.cmu.edu/~zhihaoj2>`_.
 **The code is being cleaned up and released. Please watch and star!**
 
 **Citing TOD**\ :
 
-Check out `the design paper <https://www.andrew.cmu.edu/user/yuezhao2/papers/21-preprint-tod.pdf>`_.
+Check out `the design paper <https://www.andrew.cmu.edu/user/yuezhao2/papers/22-preprint-tod.pdf>`_.
 If you use TOD in a scientific publication, we would appreciate
 citations to the following paper::
 
 
     @article{zhao2021tod,
-      title={TOD: Tensor-based Outlier Detection},
+      title={TOD: GPU-accelerated Outlier Detection via Tensor Operations},
       author={Zhao, Yue and Chen, George H and Jia, Zhihao},
       journal={arXiv preprint arXiv:2110.14007},
       year={2021}
@@ -50,7 +51,7 @@ citations to the following paper::
 
 or::
 
-    Zhao, Y., Chen, G.H. and Jia, Z., 2021. TOD: Tensor-based Outlier Detection. arXiv preprint arXiv:2110.14007.
+    Zhao, Y., Chen, G.H. and Jia, Z., 2021. TOD: GPU-accelerated Outlier Detection via Tensor Operations. arXiv preprint arXiv:2110.14007.
 
 
 
@@ -60,7 +61,7 @@ or::
 One Reason to Use It:
 ^^^^^^^^^^^^^^^^^^^^^
 
-On average, **TOD is 11 times faster than PyOD**!
+On average, **TOD is 11 times faster than PyOD** on a diverse group of OD algorithms!
 
 If you need another reason: it can handle much larger datasets---more than **a million sample** OD within an hour!
 
@@ -84,7 +85,7 @@ If you need another reason: it can handle much larger datasets---more than **a m
 **TOD is featured for**:
 
 * **Unified APIs, detailed documentation, and examples** for the easy use (under construction)
-* **More than 10 different OD algorithms** and more are being added
+* **More than 5 different OD algorithms** and more are being added
 * **The support of multi-GPU acceleration**
 * **Advanced techniques** including *provable quantization* and *automatic batching*
 
