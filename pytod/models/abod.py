@@ -5,9 +5,8 @@
 # License: BSD 2 clause
 
 
-import torch
-import scipy as sp
 import numpy as np
+import torch
 
 from .base import BaseDetector
 from .intermediate_layers import knn_batch
@@ -114,7 +113,9 @@ class ABOD(BaseDetector):
 
         # first to identity the k nearst neighbors of each sample
 
-        knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1, batch_size=self.batch_size, device=self.device)
+        knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1,
+                                       batch_size=self.batch_size,
+                                       device=self.device)
         knn_dist, knn_inds = knn_dist[:, 1:], knn_inds[:, 1:]
 
         # build index list
@@ -123,20 +124,24 @@ class ABOD(BaseDetector):
         neighbor_indexs = torch.zeros([n_samples * n_combs, 2])
 
         # create self index, each repeat n_combs times
-        self_indexs = torch.arange(0, n_samples).reshape(n_samples, 1).repeat(1, n_combs).view(-1)
+        self_indexs = torch.arange(0, n_samples).reshape(n_samples, 1).repeat(
+            1, n_combs).view(-1)
 
         # all samples' possible NN combinations are stored
         # it is fine since the loop is only for building the index
         for idx in range(n_samples):
             # print(torch.combinations(knn_inds[0, :], 2))
-            neighbor_indexs[idx * n_combs:(idx + 1) * n_combs, :] = torch.combinations(knn_inds[idx, :], 2)
+            neighbor_indexs[idx * n_combs:(idx + 1) * n_combs,
+            :] = torch.combinations(knn_inds[idx, :], 2)
 
         # select the data
         self_feature = torch.index_select(X, 0, self_indexs.long())
 
         # both need to subtruct the original feature
-        nn_1 = torch.index_select(X, 0, neighbor_indexs[:, 0].long()) - self_feature
-        nn_2 = torch.index_select(X, 0, neighbor_indexs[:, 1].long()) - self_feature
+        nn_1 = torch.index_select(X, 0,
+                                  neighbor_indexs[:, 0].long()) - self_feature
+        nn_2 = torch.index_select(X, 0,
+                                  neighbor_indexs[:, 1].long()) - self_feature
 
         # calculate cosine similarity
         cos_sims = get_cosine_similarity(nn_1, nn_2).view(-1, n_combs)
@@ -149,7 +154,9 @@ class ABOD(BaseDetector):
 
         # first to identity the k nearst neighbors of each sample
 
-        knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1, batch_size=self.batch_size, device=self.device)
+        knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1,
+                                       batch_size=self.batch_size,
+                                       device=self.device)
         knn_dist, knn_inds = knn_dist[:, 1:], knn_inds[:, 1:]
 
         # build index list
@@ -158,7 +165,8 @@ class ABOD(BaseDetector):
         neighbor_indexs = torch.zeros([n_samples * n_combs, 2])
 
         # create self index, each repeat n_combs times
-        self_indexs = torch.arange(0, n_samples).reshape(n_samples, 1).repeat(1, n_combs).view(-1)
+        self_indexs = torch.arange(0, n_samples).reshape(n_samples, 1).repeat(
+            1, n_combs).view(-1)
 
         # all samples' possible NN combinations are stored
         # it is fine since the loop is only for building the index
@@ -173,11 +181,16 @@ class ABOD(BaseDetector):
 
         for i, index in enumerate(batch_index):
             # select the data
-            self_feature = torch.index_select(X, 0, self_indexs[index[0]:index[1]].long())
+            self_feature = torch.index_select(X, 0, self_indexs[
+                                                    index[0]:index[1]].long())
 
             # both need to subtruct the original feature
-            nn_1 = torch.index_select(X, 0, neighbor_indexs[:, 0][index[0]:index[1]].long()) - self_feature
-            nn_2 = torch.index_select(X, 0, neighbor_indexs[:, 1][index[0]:index[1]].long()) - self_feature
+            nn_1 = torch.index_select(X, 0, neighbor_indexs[:, 0][
+                                            index[0]:index[
+                                                1]].long()) - self_feature
+            nn_2 = torch.index_select(X, 0, neighbor_indexs[:, 1][
+                                            index[0]:index[
+                                                1]].long()) - self_feature
 
             # calculate cosine similarity
             cos_sims[index[0]:index[1]] = get_cosine_similarity(nn_1, nn_2)

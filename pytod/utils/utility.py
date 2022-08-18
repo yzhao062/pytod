@@ -5,20 +5,14 @@
 # License: BSD 2 clause
 
 import warnings
-import torch
-import sklearn
-from sklearn.metrics import precision_score
-from sklearn.preprocessing import StandardScaler
 
 import numpy as np
+import torch
 from numpy import percentile
-import numbers
-
-from sklearn.utils import column_or_1d
-from sklearn.utils import check_array
-from sklearn.utils import check_consistent_length
-
 from pyod.utils.utility import check_parameter
+from sklearn.metrics import precision_score
+from sklearn.utils import check_consistent_length
+from sklearn.utils import column_or_1d
 
 
 def validate_device(gpu_id):
@@ -44,7 +38,8 @@ def validate_device(gpu_id):
     # if gpu is available
     if torch.cuda.is_available():
         # check if gpu id is between 0 and the total number of GPUs
-        check_parameter(gpu_id, 0, torch.cuda.device_count(), param_name='gpu id', include_left=True,
+        check_parameter(gpu_id, 0, torch.cuda.device_count(),
+                        param_name='gpu id', include_left=True,
                         include_right=False)
         device_id = 'cuda:{}'.format(gpu_id)
     else:

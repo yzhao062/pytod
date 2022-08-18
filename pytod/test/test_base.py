@@ -4,12 +4,11 @@ from __future__ import print_function
 
 import os
 import sys
-
 import unittest
-from numpy.testing import assert_equal
-from numpy.testing import assert_raises
 
 import numpy as np
+from numpy.testing import assert_equal
+from numpy.testing import assert_raises
 
 # temporary solution for relative imports in case pytod is not installed
 # if pytod is installed, no need to use the following line

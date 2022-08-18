@@ -5,9 +5,9 @@
 # License: BSD 2 clause
 
 
-import torch
-import scipy as sp
 import numpy as np
+import scipy as sp
+import torch
 
 from .base import BaseDetector
 from .intermediate_layers import knn_batch
@@ -87,7 +87,9 @@ class LOF(BaseDetector):
         self._set_n_classes(y)
 
         # find the k nearst neighbors of all samples
-        knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1, batch_size=self.batch_size, device=self.device)
+        knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1,
+                                       batch_size=self.batch_size,
+                                       device=self.device)
         knn_dist, knn_inds = knn_dist[:, 1:], knn_inds[:, 1:]
 
         # this is the index of kNN's index
@@ -114,7 +116,10 @@ class LOF(BaseDetector):
 
         # harmonic mean give the exact result!
         # todo: harmonic mean can be written in PyTorch as well
-        ar_nn = sp.stats.hmean(torch.index_select(ar, 0, knn_inds_flat).view(-1, self.n_neighbors).numpy(), axis=1)
+        ar_nn = sp.stats.hmean(
+            torch.index_select(ar, 0, knn_inds_flat).view(-1,
+                                                          self.n_neighbors).numpy(),
+            axis=1)
         assert (len(ar_nn) == len(ar))
 
         self.decision_scores_ = (ar / ar_nn).cpu().numpy()

@@ -5,12 +5,10 @@
 # License: BSD 2 clause
 
 
-import torch
-import scipy as sp
 import numpy as np
+import torch
 
 from .base import BaseDetector
-from .intermediate_layers import knn_batch
 
 
 class PCA(BaseDetector):
@@ -106,7 +104,8 @@ class PCA(BaseDetector):
 
         exaplained_var = vars_by_pc / vars_by_pc.sum()
 
-        self.decision_scores_ = torch.sum(torch.cdist(X, V.T) / exaplained_var, dim=1).cpu().numpy()
+        self.decision_scores_ = torch.sum(torch.cdist(X, V.T) / exaplained_var,
+                                          dim=1).cpu().numpy()
 
         self._process_decision_scores()
         return self

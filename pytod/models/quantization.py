@@ -7,8 +7,7 @@ from __future__ import print_function
 
 import os
 import sys
-from time import time
-import itertools
+
 import torch
 
 # temporary solution for relative imports in case pyod is not installed
@@ -21,51 +20,31 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
 from scipy.io import loadmat
 
-from pyod.models.abod import ABOD
-from pyod.models.cblof import CBLOF
 # from pyod.models.feature_bagging import FeatureBagging
-from pyod.models.hbos import HBOS
-from pyod.models.iforest import IForest
-from pyod.models.knn import KNN
-from pyod.models.lmdd import LMDD
-from pyod.models.loci import LOCI
-from pyod.models.loda import LODA
-from pyod.models.lof import LOF
-from pyod.models.mcd import MCD
-from pyod.models.ocsvm import OCSVM
-from pyod.models.pca import PCA
-from pyod.models.cof import COF
-from pyod.models.sod import SOD
 
-from pyod.utils.data import generate_data
 from pyod.utils.data import evaluate_print
 
 from pyod.utils.utility import standardizer
-from pyod.utils.utility import precision_n_scores
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import average_precision_score
-from sklearn.preprocessing import MinMaxScaler
-import arff
 
-from scipy.stats import rankdata
 from basic_operators import topk, bottomk, bottomk_low_prec, topk_low_prec
 
 from mpmath import mp, mpf
 
-machine_eps = mpf(2**-53)
+machine_eps = mpf(2 ** -53)
 
-def get_bounded_error(max_value, dimension, machine_eps=np.finfo(float).eps, two_sided=True):
+
+def get_bounded_error(max_value, dimension, machine_eps=np.finfo(float).eps,
+                      two_sided=True):
     mp.dps = 100
-    factor = (1+machine_eps)**(mp.log(dimension)+2)-1
+    factor = (1 + machine_eps) ** (mp.log(dimension) + 2) - 1
     if two_sided:
-        return float(2*(4*dimension*(max_value**2)*factor))
+        return float(2 * (4 * dimension * (max_value ** 2) * factor))
     else:
-        return float(4*dimension*(max_value**2)*factor)
-    
+        return float(4 * dimension * (max_value ** 2) * factor)
+
+
 # print(get_bounded_error(1, 1000000))
 # error_bound = float(get_bounded_error(1, 1000000))
 
@@ -83,7 +62,7 @@ mat_file_list = [
     # 'mammography.mat',
     # 'mnist.mat',
     # 'musk.mat',
-    
+
     # 'optdigits.mat',
     # 'pendigits.mat',
     # 'pima.mat',
@@ -136,26 +115,28 @@ bottomk_dist1, bottomk_indices1 = bottomk_low_prec(cdist_dist, k)
 print()
 print('bottomk is not sorted...')
 # we can only ensure the top k
-print(torch.sum((bottomk_dist[:, k-1] !=bottomk_dist1[:, k-1]).int()))
-print(torch.sum((bottomk_indices[:, k-1]!=bottomk_indices1[:, k-1]).int()))
+print(torch.sum((bottomk_dist[:, k - 1] != bottomk_dist1[:, k - 1]).int()))
+print(
+    torch.sum((bottomk_indices[:, k - 1] != bottomk_indices1[:, k - 1]).int()))
 
 # we can only ensure the top k
-print(torch.sum((bottomk_dist !=bottomk_dist1).int()))
-print(torch.sum((bottomk_indices!=bottomk_indices1).int()))
+print(torch.sum((bottomk_dist != bottomk_dist1).int()))
+print(torch.sum((bottomk_indices != bottomk_indices1).int()))
 
-
-bottomk_dist2, bottomk_indices2 = bottomk_low_prec(cdist_dist, k, sort_value=True)
+bottomk_dist2, bottomk_indices2 = bottomk_low_prec(cdist_dist, k,
+                                                   sort_value=True)
 print()
 print('bottomk is sorted...')
 # we ensure topk
-print(torch.sum((bottomk_dist[:, k-1] !=bottomk_dist2[:, k-1]).int()))
-print(torch.sum((bottomk_indices[:, k-1]!=bottomk_indices2[:, k-1]).int()))
+print(torch.sum((bottomk_dist[:, k - 1] != bottomk_dist2[:, k - 1]).int()))
+print(
+    torch.sum((bottomk_indices[:, k - 1] != bottomk_indices2[:, k - 1]).int()))
 
 # we can ensure all
-print(torch.sum((bottomk_dist !=bottomk_dist2).int()))
-print(torch.sum((bottomk_indices!=bottomk_indices2).int()))
+print(torch.sum((bottomk_dist != bottomk_dist2).int()))
+print(torch.sum((bottomk_indices != bottomk_indices2).int()))
 
-#%%
+# %%
 
 print()
 print('topk is not sorted...')
@@ -163,28 +144,24 @@ print('topk is not sorted...')
 topk_dist, topk_indices = topk(cdist_dist, k)
 topk_dist1, topk_indices1 = topk_low_prec(cdist_dist, k)
 
-
 # we can only ensure the top k
-print(torch.sum((topk_dist[:, k-1] !=topk_dist1[:, k-1]).int()))
-print(torch.sum((topk_indices[:, k-1]!=topk_indices1[:, k-1]).int()))
+print(torch.sum((topk_dist[:, k - 1] != topk_dist1[:, k - 1]).int()))
+print(torch.sum((topk_indices[:, k - 1] != topk_indices1[:, k - 1]).int()))
 
-print(torch.sum((topk_dist !=topk_dist1).int()))
-print(torch.sum((topk_indices!=topk_indices1).int()))
+print(torch.sum((topk_dist != topk_dist1).int()))
+print(torch.sum((topk_indices != topk_indices1).int()))
 
 topk_dist2, topk_indices2 = topk_low_prec(cdist_dist, k, sort_value=True)
 print()
 print('topk is sorted...')
-print(torch.sum((topk_dist[:, k-1] !=topk_dist2[:, k-1]).int()))
-print(torch.sum((topk_indices[:, k-1]!=topk_indices2[:, k-1]).int()))
+print(torch.sum((topk_dist[:, k - 1] != topk_dist2[:, k - 1]).int()))
+print(torch.sum((topk_indices[:, k - 1] != topk_indices2[:, k - 1]).int()))
 
-print(torch.sum((topk_dist !=topk_dist2).int()))
-print(torch.sum((topk_indices!=topk_indices2).int()))
+print(torch.sum((topk_dist != topk_dist2).int()))
+print(torch.sum((topk_indices != topk_indices2).int()))
 
-
-
-# here we flip the order 
+# here we flip the order
 decision_scores = bottomk_dist[:, -1]
-
 
 evaluate_print('knn', y, decision_scores.cpu())
 
@@ -226,28 +203,28 @@ evaluate_print('knn', y, decision_scores.cpu())
 # import time
 
 # def Standardizer(X_train, mean=None, std=None, return_mean_std=False):
-    
+
 #     if mean is None:
 #         mean = torch.mean(X_train, axis=0)
 #         std = torch.std(X_train, axis=0)
 #         # print(mean.shape, std.shape)
 #         assert (mean.shape[0] == X_train.shape[1])
 #         assert (std.shape[0] == X_train.shape[1])
-    
-    
+
+
 #     X_train_norm = (X_train-mean)/std
 #     assert(X_train_norm.shape == X_train.shape)
-    
+
 #     if return_mean_std:
 #         return X_train_norm, mean, std
 #     else:
 #         return  X_train_norm
-    
+
 # contamination = 0.1  # percentage of outliers
 # n_train = 200000  # number of training points
 # n_test = 1000  # number of testing points
 # n_features = 2000
-    
+
 # # Generate sample data
 # X_train, y_train, X_test, y_test = \
 #     generate_data(n_train=n_train,
@@ -264,7 +241,6 @@ evaluate_print('knn', y, decision_scores.cpu())
 
 # # X_train_norm, X_train_mean, X_train_std = Standardizer(X_train, return_mean_std=True)
 # # X_test_norm = Standardizer(X_test, mean=X_train_mean, std=X_train_std)
-
 
 
 # # X_train_norm = X_train.half().cuda()
@@ -285,5 +261,4 @@ evaluate_print('knn', y, decision_scores.cpu())
 
 # print(prof.display())
 
-#%%
-
+# %%

@@ -4,16 +4,15 @@
 # Author: Yue Zhao <zhaoy@cmu.edu>
 # License: BSD 2 clause
 
-import torch
-import scipy as sp
 import numpy as np
+import torch
 
 from .base import BaseDetector
 from .basic_operators import histt
 
 
 class HBOS(BaseDetector):
-    """Histogram- based outlier detection (HBOS) is an efficient unsupervised
+    """Histogram-based outlier detection (HBOS) is an efficient unsupervised
     method. It assumes the feature independence and calculates the degree
     of outlyingness by building histograms. See :cite:`goldstein2012histogram`
     for details.
@@ -97,7 +96,8 @@ class HBOS(BaseDetector):
         outlier_scores = torch.zeros([n_samples, n_features]).to(self.device)
 
         for i in range(n_features):
-            hist_[:, i], bin_edges[:, i] = histt(X[:, i], bins=self.n_bins, device=self.device)
+            hist_[:, i], bin_edges[:, i] = histt(X[:, i], bins=self.n_bins,
+                                                 device=self.device)
 
         hist_ = hist_.contiguous()
         bin_edges = bin_edges.contiguous()
@@ -111,7 +111,8 @@ class HBOS(BaseDetector):
             bin_inds[bin_inds == self.n_bins + 1] = self.n_bins
             outlier_scores[:, i] = out_score_i[bin_inds - 1]
 
-        self.decision_scores_ = (torch.sum(outlier_scores, dim=1) * -1).cpu().numpy()
+        self.decision_scores_ = (
+                torch.sum(outlier_scores, dim=1) * -1).cpu().numpy()
 
         self._process_decision_scores()
         return self

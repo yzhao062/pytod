@@ -1,12 +1,11 @@
-import torch
 import numpy as np
-from sklearn.metrics import average_precision_score, roc_auc_score
-from sklearn.utils import column_or_1d
-from sklearn.utils import check_consistent_length
-
-from pyod.utils.utility import precision_n_scores
+import torch
 from pyod.utils.data import evaluate_print as evaluate_print_np
 from pyod.utils.data import generate_data as generate_data_pyod
+from pyod.utils.utility import precision_n_scores
+from sklearn.metrics import roc_auc_score
+from sklearn.utils import check_consistent_length
+from sklearn.utils import column_or_1d
 
 
 def generate_data(n_train=1000, n_test=500, n_features=2, contamination=0.1,
@@ -67,16 +66,22 @@ def generate_data(n_train=1000, n_test=500, n_features=2, contamination=0.1,
 
     """
     if train_only:
-        X_train, y_train = generate_data_pyod(n_train, n_test, n_features, contamination,
+        X_train, y_train = generate_data_pyod(n_train, n_test, n_features,
+                                              contamination,
                                               train_only, offset, 'new',
                                               random_state, n_nan, n_inf)
         return torch.from_numpy(X_train), torch.from_numpy(y_train)
     else:
-        X_train, X_test, y_train, y_test = generate_data_pyod(n_train, n_test, n_features, contamination,
-                                                              train_only, offset, 'new',
-                                                              random_state, n_nan, n_inf)
+        X_train, X_test, y_train, y_test = generate_data_pyod(n_train, n_test,
+                                                              n_features,
+                                                              contamination,
+                                                              train_only,
+                                                              offset, 'new',
+                                                              random_state,
+                                                              n_nan, n_inf)
 
-        return torch.from_numpy(X_train), torch.from_numpy(y_train), torch.from_numpy(X_test), torch.from_numpy(y_test)
+        return torch.from_numpy(X_train), torch.from_numpy(
+            y_train), torch.from_numpy(X_test), torch.from_numpy(y_test)
 
 
 def evaluate_print(clf_name, y, y_pred):

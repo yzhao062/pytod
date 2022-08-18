@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import time
 import numpy as np
 import torch
+from mpmath import mp
+from pyod.utils.utility import get_list_diff
 from torch import cdist
 
-from pyod.utils.data import generate_data
-from pyod.utils.data import evaluate_print
-from pyod.utils.utility import get_list_diff
-
-from itertools import combinations
-from ..utils.utility import Standardizer, get_batch_index
-
 from .basic_operators import cdist, bottomk
-from mpmath import mp, mpf
+from ..utils.utility import get_batch_index
 
 
 # machine_eps = mpf(2**-53)
@@ -243,7 +237,8 @@ def get_knn_from_intermediate(intermediate_knn, k):
 def knn_batch(A, B, k=5, p=2.0, batch_size=None, device='cpu'):
     if batch_size is None:
         return knn_full(A, B, k, p, device)
-    intermediate_knn = knn_batch_intermediate(A.to(device), B.to(device), k, p, batch_size)
+    intermediate_knn = knn_batch_intermediate(A.to(device), B.to(device), k, p,
+                                              batch_size)
     return get_knn_from_intermediate(intermediate_knn, k)
 
 
