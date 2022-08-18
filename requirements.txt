@@ -3,4 +3,4 @@ torch>=1.7
 scipy
 scikit_learn>=0.20
 mpmath
-pyod
+pyod>=1.0.4
