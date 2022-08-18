@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
-"""Example of using Angle-base outlier detection (ABOD) for outlier detection
+"""Example of using PyTOD on real-world datasets
 """
 # Author: Yue Zhao <zhaoy@cmu.edu>
 # License: BSD 2 clause
 
-import torch
+import os
 import sys
 import time
 
-from scipy.io import loadmat
-import os
 import numpy as np
-
-from pyod.models.lof import LOF as PyOD_LOF
-from pyod.models.knn import KNN as PyOD_KNN
-from pyod.models.hbos import HBOS as PyOD_HBOS
+import torch
 from pyod.models.abod import ABOD as PyOD_ABOD
+from pyod.models.hbos import HBOS as PyOD_HBOS
+from pyod.models.knn import KNN as PyOD_KNN
+from pyod.models.lof import LOF as PyOD_LOF
 from pyod.models.pca import PCA as PyOD_PCA
-
 from pyod.utils.utility import precision_n_scores
+from scipy.io import loadmat
 from sklearn.metrics import roc_auc_score
 
 # temporary solution for relative imports in case pyod is not installed
@@ -101,7 +99,8 @@ for j in range(len(mat_file_list)):
 
     # initialize the output file
     text_file = open("results.txt", "a")
-    text_file.write('file' + '|' + 'algorithm' + '|' + 'system' + '|' + 'ROC' + '|' + 'PRN' + '|' + 'Runtime' + '\n')
+    text_file.write(
+        'file' + '|' + 'algorithm' + '|' + 'system' + '|' + 'ROC' + '|' + 'PRN' + '|' + 'Runtime' + '\n')
 
     for key in models.keys():
         clf = models[key]
@@ -117,7 +116,9 @@ for j in range(len(mat_file_list)):
         prn = get_prn(y, decision_scores)
 
         print(mat_file, key, roc, prn, dur)
-        text_file.write(mat_file + '|' + key + '|' + 'PyOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+        text_file.write(
+            mat_file + '|' + key + '|' + 'PyOD' + '|' + str(roc) + '|' + str(
+                prn) + '|' + str(dur) + '\n')
     text_file.close()
 
     # get results from PyTOD
@@ -139,9 +140,11 @@ for j in range(len(mat_file_list)):
     prn = get_prn(y, decision_scores)
 
     print(mat_file, key, roc, prn, dur)
-    text_file.write(mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+    text_file.write(
+        mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(
+            prn) + '|' + str(dur) + '\n')
     text_file.close()
-    #############################################################################################
+    ###########################################################################
     text_file = open("results.txt", "a")
     key = 'ABOD'
     start = time.time()
@@ -156,9 +159,11 @@ for j in range(len(mat_file_list)):
     prn = get_prn(y, decision_scores)
 
     print(mat_file, key, roc, prn, dur)
-    text_file.write(mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+    text_file.write(
+        mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(
+            prn) + '|' + str(dur) + '\n')
     text_file.close()
-    #############################################################################################
+    ###########################################################################
     text_file = open("results.txt", "a")
     key = 'HBOS'
     start = time.time()
@@ -173,7 +178,9 @@ for j in range(len(mat_file_list)):
     prn = get_prn(y, decision_scores)
 
     print(mat_file, key, roc, prn, dur)
-    text_file.write(mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+    text_file.write(
+        mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(
+            prn) + '|' + str(dur) + '\n')
     text_file.close()
     # #############################################################################################
     text_file = open("results.txt", "a")
@@ -190,7 +197,9 @@ for j in range(len(mat_file_list)):
     prn = get_prn(y, decision_scores)
 
     print(mat_file, key, roc, prn, dur)
-    text_file.write(mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+    text_file.write(
+        mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(
+            prn) + '|' + str(dur) + '\n')
     text_file.close()
     # #############################################################################################
     text_file = open("results.txt", "a")
@@ -207,7 +216,9 @@ for j in range(len(mat_file_list)):
     prn = get_prn(y, decision_scores)
 
     print(mat_file, key, roc, prn, dur)
-    text_file.write(mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+    text_file.write(
+        mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(
+            prn) + '|' + str(dur) + '\n')
     text_file.close()
 
     print("The results are stored in results.txt.")

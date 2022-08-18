@@ -4,14 +4,14 @@
 # Author: Yue Zhao <zhaoy@cmu.edu>
 # License: BSD 2 clause
 
-import torch
-from pyod.models.knn import KNN as KNN_PyOD
-from pyod.utils.data import generate_data
-from pyod.utils.data import evaluate_print
-
 import os
 import sys
 import time
+
+import torch
+from pyod.models.knn import KNN as KNN_PyOD
+from pyod.utils.data import evaluate_print
+from pyod.utils.data import generate_data
 
 # temporary solution for relative imports in case pyod is not installed
 # if pyod is installed, no need to use the following line
@@ -76,4 +76,5 @@ evaluate_print(clf_name, y_train, y_train_scores)
 tod_time = end - start
 print('Execution time', end - start)
 
-print('TOD is', round(pyod_time / tod_time, ndigits=2), 'times faster than PyOD')
+print('TOD is', round(pyod_time / tod_time, ndigits=2),
+      'times faster than PyOD')

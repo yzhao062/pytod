@@ -1,31 +1,21 @@
 # -*- coding: utf-8 -*-
-"""Example of using Angle-base outlier detection (ABOD) for outlier detection
+"""Example of using PyTOD on synthetic datasets
 """
 # Author: Yue Zhao <zhaoy@cmu.edu>
 # License: BSD 2 clause
-
-import torch
-from pyod.models.abod import ABOD as ABOD_PyOD
-from pyod.utils.data import generate_data
-from pyod.utils.data import evaluate_print
 
 import os
 import sys
 import time
 
-from scipy.io import loadmat
-from scipy.stats import rankdata
-import os
-from scipy.stats import kendalltau
 import numpy as np
-import pandas as pd
-
-from pyod.models.lof import LOF as PyOD_LOF
-from pyod.models.knn import KNN as PyOD_KNN
-from pyod.models.hbos import HBOS as PyOD_HBOS
+import torch
 from pyod.models.abod import ABOD as PyOD_ABOD
+from pyod.models.hbos import HBOS as PyOD_HBOS
+from pyod.models.knn import KNN as PyOD_KNN
+from pyod.models.lof import LOF as PyOD_LOF
 from pyod.models.pca import PCA as PyOD_PCA
-
+from pyod.utils.data import generate_data
 from pyod.utils.utility import precision_n_scores
 from sklearn.metrics import roc_auc_score
 
@@ -90,7 +80,8 @@ models = {
 }
 
 text_file = open("results_synthetic.txt", "a")
-text_file.write('file' + '|' + 'algorithm' + '|' + 'system' + '|' + 'ROC' + '|' + 'PRN' + '|' + 'Runtime' + '\n')
+text_file.write(
+    'file' + '|' + 'algorithm' + '|' + 'system' + '|' + 'ROC' + '|' + 'PRN' + '|' + 'Runtime' + '\n')
 
 for key in models.keys():
     clf = models[key]
@@ -106,7 +97,9 @@ for key in models.keys():
     prn = get_prn(y, decision_scores)
 
     print(mat_file, key, roc, prn, dur)
-    text_file.write(mat_file + '|' + key + '|' + 'PyOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+    text_file.write(
+        mat_file + '|' + key + '|' + 'PyOD' + '|' + str(roc) + '|' + str(
+            prn) + '|' + str(dur) + '\n')
 
 text_file.close()
 
@@ -129,7 +122,9 @@ roc = get_roc(y, decision_scores)
 prn = get_prn(y, decision_scores)
 
 print(mat_file, key, roc, prn, dur)
-text_file.write(mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+text_file.write(
+    mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(
+        prn) + '|' + str(dur) + '\n')
 text_file.close()
 #############################################################################################
 text_file = open("results_synthetic.txt", "a")
@@ -146,7 +141,9 @@ roc = get_roc(y, decision_scores)
 prn = get_prn(y, decision_scores)
 
 print(mat_file, key, roc, prn, dur)
-text_file.write(mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+text_file.write(
+    mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(
+        prn) + '|' + str(dur) + '\n')
 text_file.close()
 #############################################################################################
 text_file = open("results_synthetic.txt", "a")
@@ -163,7 +160,9 @@ roc = get_roc(y, decision_scores)
 prn = get_prn(y, decision_scores)
 
 print(mat_file, key, roc, prn, dur)
-text_file.write(mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+text_file.write(
+    mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(
+        prn) + '|' + str(dur) + '\n')
 text_file.close()
 # #############################################################################################
 text_file = open("results_synthetic.txt", "a")
@@ -180,7 +179,9 @@ roc = get_roc(y, decision_scores)
 prn = get_prn(y, decision_scores)
 
 print(mat_file, key, roc, prn, dur)
-text_file.write(mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+text_file.write(
+    mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(
+        prn) + '|' + str(dur) + '\n')
 text_file.close()
 # #############################################################################################
 text_file = open("results_synthetic.txt", "a")
@@ -197,7 +198,9 @@ roc = get_roc(y, decision_scores)
 prn = get_prn(y, decision_scores)
 
 print(mat_file, key, roc, prn, dur)
-text_file.write(mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(prn) + '|' + str(dur) + '\n')
+text_file.write(
+    mat_file + '|' + key + '|' + 'PyTOD' + '|' + str(roc) + '|' + str(
+        prn) + '|' + str(dur) + '\n')
 text_file.close()
 
 print("The results are stored in results_synthetic.txt.")
