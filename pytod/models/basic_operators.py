@@ -247,6 +247,27 @@ def post_check_intersection1d(t1, t2, intersect):
             assert ('intersection error')
 
 
+def ecdf_multiple(X, device='cpu'):
+    """Get the ECDF results per feature. GPU version is way faster than the
+    CPU version.
+
+    Parameters
+    ----------
+    X : numpy array of shape (n_samples, n_features)
+        The input samples.
+
+    device : string of device (default='cpu')
+
+    Returns
+    -------
+
+    ECDF : numpy array of shape (n_samples, n_features)
+    """
+    argx_tensor = torch.argsort(X.to(device), dim=0)
+    y_tensor = torch.linspace(1 / X.shape[0], 1, X.shape[0]).to(device)
+    return y_tensor[argx_tensor].cpu()
+
+
 def svd_randomized(M, k=10):
     # http://gregorygundersen.com/blog/2019/01/17/randomized-svd/
     # http://algorithm-interest-group.me/assets/slides/randomized_SVD.pdf
