@@ -84,14 +84,20 @@ class ABOD(BaseDetector):
         self.batch_size = batch_size
         self.device = device
 
-    def fit(self, X, y=None):
+    def fit(self, X, y=None, return_time=False):
         """Fit detector. y is ignored in unsupervised methods.
+
         Parameters
         ----------
         X : numpy array of shape (n_samples, n_features)
             The input samples.
+
         y : Ignored
             Not used, present for API consistency by convention.
+
+        return_time : boolean (default=True)
+            If True, set self.gpu_time to the measured GPU time.
+
         Returns
         -------
         self : object
@@ -102,20 +108,26 @@ class ABOD(BaseDetector):
         self._set_n_classes(y)
 
         if self.batch_size is None:
-            self.decision_scores_ = self._fit_full(X)
+            self.decision_scores_ = self._fit_full(X, return_time)
         else:
-            self.decision_scores_ = self._fit_full(X)
+            self.decision_scores_ = self._fit_batch(X, return_time)
+
         self._process_decision_scores()
+
         return self
 
-    def _fit_full(self, X):
+    def _fit_full(self, X, return_time):
         n_samples, n_features = X.shape[0], X.shape[1]
 
-        # first to identity the k nearst neighbors of each sample
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
 
+        # first to identity the k nearst neighbors of each sample
         knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1,
                                        batch_size=self.batch_size,
                                        device=self.device)
+
         knn_dist, knn_inds = knn_dist[:, 1:], knn_inds[:, 1:]
 
         # build index list
@@ -134,6 +146,12 @@ class ABOD(BaseDetector):
             neighbor_indexs[idx * n_combs:(idx + 1) * n_combs,
             :] = torch.combinations(knn_inds[idx, :], 2)
 
+        end.record()
+        torch.cuda.synchronize()
+        # return GPU time in seconds
+        if return_time:
+            self.gpu_time = start.elapsed_time(end) / 1000
+
         # select the data
         self_feature = torch.index_select(X, 0, self_indexs.long())
 
@@ -149,14 +167,17 @@ class ABOD(BaseDetector):
         abod_scores = torch.nan_to_num(torch.var(cos_sims, dim=1)).numpy() * -1
         return abod_scores
 
-    def _fit_batch(self, X):
+    def _fit_batch(self, X, return_time):
         n_samples, n_features = X.shape[0], X.shape[1]
 
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
         # first to identity the k nearst neighbors of each sample
-
         knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1,
                                        batch_size=self.batch_size,
                                        device=self.device)
+
         knn_dist, knn_inds = knn_dist[:, 1:], knn_inds[:, 1:]
 
         # build index list
@@ -194,6 +215,12 @@ class ABOD(BaseDetector):
 
             # calculate cosine similarity
             cos_sims[index[0]:index[1]] = get_cosine_similarity(nn_1, nn_2)
+
+        end.record()
+        torch.cuda.synchronize()
+        # return GPU time in seconds
+        if return_time:
+            self.gpu_time = start.elapsed_time(end) / 1000
 
         cos_sims = cos_sims.view(-1, n_combs)
 

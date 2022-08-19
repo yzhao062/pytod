@@ -69,14 +69,20 @@ class LOF(BaseDetector):
         self.batch_size = batch_size
         self.device = device
 
-    def fit(self, X, y=None):
+    def fit(self, X, y=None, return_time=False):
         """Fit detector. y is ignored in unsupervised methods.
+
         Parameters
         ----------
         X : numpy array of shape (n_samples, n_features)
             The input samples.
+
         y : Ignored
             Not used, present for API consistency by convention.
+
+        return_time : boolean (default=True)
+            If True, set self.gpu_time to the measured GPU time.
+
         Returns
         -------
         self : object
@@ -86,11 +92,18 @@ class LOF(BaseDetector):
         # X = check_array(X)
         self._set_n_classes(y)
 
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
+
         # find the k nearst neighbors of all samples
         knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1,
                                        batch_size=self.batch_size,
                                        device=self.device)
         knn_dist, knn_inds = knn_dist[:, 1:], knn_inds[:, 1:]
+
+        end.record()
+        torch.cuda.synchronize()
 
         # this is the index of kNN's index
         knn_inds_flat = torch.flatten(knn_inds).long()
@@ -125,6 +138,10 @@ class LOF(BaseDetector):
         self.decision_scores_ = (ar / ar_nn).cpu().numpy()
 
         self._process_decision_scores()
+
+        # return GPU time in seconds
+        if return_time:
+            self.gpu_time = start.elapsed_time(end) / 1000
         return self
 
     def decision_function(self, X):

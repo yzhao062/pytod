@@ -5,6 +5,7 @@
 # License: BSD 2 clause
 
 import numpy as np
+import torch
 
 from .base import BaseDetector
 from .intermediate_layers import knn_batch
@@ -68,14 +69,20 @@ class KNN(BaseDetector):
         self.batch_size = batch_size
         self.device = device
 
-    def fit(self, X, y=None):
+    def fit(self, X, y=None, return_time=False):
         """Fit detector. y is ignored in unsupervised methods.
+
         Parameters
         ----------
         X : numpy array of shape (n_samples, n_features)
             The input samples.
+
         y : Ignored
             Not used, present for API consistency by convention.
+
+        return_time : boolean (default=True)
+            If True, set self.gpu_time to the measured GPU time.
+
         Returns
         -------
         self : object
@@ -85,12 +92,23 @@ class KNN(BaseDetector):
         # X = check_array(X)
         self._set_n_classes(y)
 
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
+
         knn_dist, _ = knn_batch(X, X, self.n_neighbors + 1,
                                 batch_size=self.batch_size,
                                 device=self.device)
+        end.record()
+        torch.cuda.synchronize()
 
         self.decision_scores_ = knn_dist[:, -1].cpu().numpy()
         self._process_decision_scores()
+
+        # return GPU time in seconds
+        if return_time:
+            self.gpu_time = start.elapsed_time(end) / 1000
+
         return self
 
     def decision_function(self, X):

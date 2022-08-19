@@ -184,11 +184,13 @@ def knn_batch_intermediate(A, B, k=5, p=2.0, batch_size=None):
 
     batch_index_A = get_batch_index(n_samples, batch_size)
     batch_index_B = get_batch_index(n_distance, batch_size)
-    print(batch_index_A)
-    print(batch_index_B)
+    # print(batch_index_A)
+    # print(batch_index_B)
 
     n_batch_A = len(batch_index_A)
     n_batch_B = len(batch_index_B)
+
+    print('Total number of batches', n_batch_A*n_batch_B)
 
     # this is a cpu tensor to save space
     # cdist_mat = torch.zeros([n_samples, n_distance])

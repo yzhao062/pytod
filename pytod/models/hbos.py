@@ -70,14 +70,20 @@ class HBOS(BaseDetector):
         self.alpha = alpha
         self.device = device
 
-    def fit(self, X, y=None):
+    def fit(self, X, y=None, return_time=False):
         """Fit detector. y is ignored in unsupervised methods.
+
         Parameters
         ----------
         X : numpy array of shape (n_samples, n_features)
             The input samples.
+
         y : Ignored
             Not used, present for API consistency by convention.
+
+        return_time : boolean (default=True)
+            If True, set self.gpu_time to the measured GPU time.
+
         Returns
         -------
         self : object
@@ -86,6 +92,10 @@ class HBOS(BaseDetector):
         # todo: add one for pytorch tensor
         # X = check_array(X)
         self._set_n_classes(y)
+
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
 
         X = X.to(self.device)
         n_samples, n_features = X.shape[0], X.shape[1]
@@ -111,10 +121,18 @@ class HBOS(BaseDetector):
             bin_inds[bin_inds == self.n_bins + 1] = self.n_bins
             outlier_scores[:, i] = out_score_i[bin_inds - 1]
 
+        end.record()
+        torch.cuda.synchronize()
+
         self.decision_scores_ = (
                 torch.sum(outlier_scores, dim=1) * -1).cpu().numpy()
 
         self._process_decision_scores()
+
+        # return GPU time in seconds
+        if return_time:
+            self.gpu_time = start.elapsed_time(end) / 1000
+
         return self
 
     def decision_function(self, X):

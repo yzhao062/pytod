@@ -85,7 +85,7 @@ def get_batch_index(n_samples, batch_size):
 
     index_tracker = []
     n_batches = int(np.ceil(n_samples // batch_size))
-    print('n_batches', n_batches)
+    # print('n_batches', n_batches)
     tracker = 0
     left_index, right_index = 0, 0
     for i in range(n_batches):
