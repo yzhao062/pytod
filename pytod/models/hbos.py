@@ -93,9 +93,10 @@ class HBOS(BaseDetector):
         # X = check_array(X)
         self._set_n_classes(y)
 
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
-        start.record()
+        if self.device != 'cpu' and return_time:
+            start = torch.cuda.Event(enable_timing=True)
+            end = torch.cuda.Event(enable_timing=True)
+            start.record()
 
         X = X.to(self.device)
         n_samples, n_features = X.shape[0], X.shape[1]
@@ -121,8 +122,9 @@ class HBOS(BaseDetector):
             bin_inds[bin_inds == self.n_bins + 1] = self.n_bins
             outlier_scores[:, i] = out_score_i[bin_inds - 1]
 
-        end.record()
-        torch.cuda.synchronize()
+        if self.device != 'cpu' and return_time:
+            end.record()
+            torch.cuda.synchronize()
 
         self.decision_scores_ = (
                 torch.sum(outlier_scores, dim=1) * -1).cpu().numpy()
@@ -130,7 +132,7 @@ class HBOS(BaseDetector):
         self._process_decision_scores()
 
         # return GPU time in seconds
-        if return_time:
+        if self.device != 'cpu' and return_time:
             self.gpu_time = start.elapsed_time(end) / 1000
 
         return self

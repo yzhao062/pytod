@@ -11,9 +11,6 @@ from .base import BaseDetector
 from .basic_operators import ecdf_multiple
 
 
-# from .intermediate_layers import knn_batch
-
-
 class ECOD(BaseDetector):
     """ECOD class for Unsupervised Outlier Detection Using Empirical
     Cumulative Distribution Functions (ECOD)
@@ -76,16 +73,18 @@ class ECOD(BaseDetector):
         # X = check_array(X)
         self._set_n_classes(y)
 
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
-        start.record()
+        if self.device != 'cpu' and return_time:
+            start = torch.cuda.Event(enable_timing=True)
+            end = torch.cuda.Event(enable_timing=True)
+            start.record()
 
         # density estimation via ECDF
-        self.U_l = ecdf_multiple(X)
-        self.U_r = ecdf_multiple(-X)
+        self.U_l = ecdf_multiple(X, device=self.device)
+        self.U_r = ecdf_multiple(-X, device=self.device)
 
-        end.record()
-        torch.cuda.synchronize()
+        if self.device != 'cpu' and return_time:
+            end.record()
+            torch.cuda.synchronize()
 
         # take the negative log
         self.U_l = -1 * torch.log(self.U_l)
@@ -98,7 +97,7 @@ class ECOD(BaseDetector):
         self._process_decision_scores()
 
         # return GPU time in seconds
-        if return_time:
+        if self.device != 'cpu' and return_time:
             self.gpu_time = start.elapsed_time(end) / 1000
 
         return self

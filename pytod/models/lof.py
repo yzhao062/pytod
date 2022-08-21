@@ -92,9 +92,10 @@ class LOF(BaseDetector):
         # X = check_array(X)
         self._set_n_classes(y)
 
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
-        start.record()
+        if self.device != 'cpu' and return_time:
+            start = torch.cuda.Event(enable_timing=True)
+            end = torch.cuda.Event(enable_timing=True)
+            start.record()
 
         # find the k nearst neighbors of all samples
         knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1,
@@ -102,8 +103,9 @@ class LOF(BaseDetector):
                                        device=self.device)
         knn_dist, knn_inds = knn_dist[:, 1:], knn_inds[:, 1:]
 
-        end.record()
-        torch.cuda.synchronize()
+        if self.device != 'cpu' and return_time:
+            end.record()
+            torch.cuda.synchronize()
 
         # this is the index of kNN's index
         knn_inds_flat = torch.flatten(knn_inds).long()
@@ -140,7 +142,7 @@ class LOF(BaseDetector):
         self._process_decision_scores()
 
         # return GPU time in seconds
-        if return_time:
+        if self.device != 'cpu' and return_time:
             self.gpu_time = start.elapsed_time(end) / 1000
         return self
 

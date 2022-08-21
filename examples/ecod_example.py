@@ -36,7 +36,7 @@ X_train, X_test, y_train, y_test = \
                   contamination=contamination,
                   random_state=42)
 
-clf_name = 'HBOS-PyOD'
+clf_name = 'ECOD-PyOD'
 clf = ECOD_PyOD()
 start = time.time()
 clf.fit(X_train)

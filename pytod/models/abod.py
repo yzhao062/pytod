@@ -119,9 +119,10 @@ class ABOD(BaseDetector):
     def _fit_full(self, X, return_time):
         n_samples, n_features = X.shape[0], X.shape[1]
 
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
-        start.record()
+        if self.device != 'cpu' and return_time:
+            start = torch.cuda.Event(enable_timing=True)
+            end = torch.cuda.Event(enable_timing=True)
+            start.record()
 
         # first to identity the k nearst neighbors of each sample
         knn_dist, knn_inds = knn_batch(X, X, self.n_neighbors + 1,
@@ -146,10 +147,10 @@ class ABOD(BaseDetector):
             neighbor_indexs[idx * n_combs:(idx + 1) * n_combs,
             :] = torch.combinations(knn_inds[idx, :], 2)
 
-        end.record()
-        torch.cuda.synchronize()
-        # return GPU time in seconds
-        if return_time:
+        if self.device != 'cpu' and return_time:
+            end.record()
+            torch.cuda.synchronize()
+            # return GPU time in seconds
             self.gpu_time = start.elapsed_time(end) / 1000
 
         # select the data

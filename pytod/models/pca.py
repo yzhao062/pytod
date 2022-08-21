@@ -99,9 +99,10 @@ class PCA(BaseDetector):
         # X = check_array(X)
         self._set_n_classes(y)
 
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
-        start.record()
+        if self.device != 'cpu' and return_time:
+            start = torch.cuda.Event(enable_timing=True)
+            end = torch.cuda.Event(enable_timing=True)
+            start.record()
 
         X = X.to(self.device)
 
@@ -114,8 +115,9 @@ class PCA(BaseDetector):
 
         exaplained_var = vars_by_pc / vars_by_pc.sum()
 
-        end.record()
-        torch.cuda.synchronize()
+        if self.device != 'cpu' and return_time:
+            end.record()
+            torch.cuda.synchronize()
 
         self.decision_scores_ = torch.sum(torch.cdist(X, V.T) / exaplained_var,
                                           dim=1).cpu().numpy()
