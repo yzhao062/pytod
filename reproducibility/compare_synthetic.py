@@ -55,17 +55,15 @@ def get_prn(y, y_pred):
 # define the synthetic data here
 contamination = 0.1  # percentage of outliers
 n_train = 10000  # number of training points
-n_test = 5000  # number of testing points
 n_features = 200
 k = 20
 
 # Generate sample data
-X, y, X_test, y_test = \
-    generate_data(n_train=n_train,
-                  n_test=n_test,
-                  n_features=n_features,
-                  contamination=contamination,
-                  random_state=42)
+X, y = generate_data(n_train=n_train,
+                     n_features=n_features,
+                     contamination=contamination,
+                     train_only=True,
+                     random_state=42)
 
 mat_file = str(n_train) + '_' + str(n_features)
 X_torch = torch.from_numpy(X).float()
@@ -187,7 +185,7 @@ text_file.close()
 text_file = open("results_synthetic.txt", "a")
 key = 'PCA'
 start = time.time()
-clf = PCA(n_components=5)
+clf = PCA(n_components=5, device=device)
 clf.fit(X_torch)
 decision_scores = clf.decision_scores_
 decision_scores = np.nan_to_num(decision_scores)
