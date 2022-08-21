@@ -12,7 +12,7 @@ from torch import cdist as torch_cdist
 torch.set_grad_enabled(False)
 
 
-def cdist(a, b=None, p=2):
+def cdist(a, b=None, p=2, device='cpu'):
     """Basic cdist without using batching
 
     Parameters
@@ -27,9 +27,9 @@ def cdist(a, b=None, p=2):
     """
     if b is None:
         b = a
-        return torch_cdist(b, b, p=p)
+        return torch_cdist(b.to(device), b.to(device), p=p)
     else:
-        return torch_cdist(a, b, p=p)
+        return torch_cdist(a.to(device), b.to(device), p=p)
 
 
 def cdist_s(a, b):
@@ -51,7 +51,7 @@ def cdist_s(a, b):
     return torch.sqrt(w)
 
 
-def topk(A, k, dim=1):
+def topk(A, k, dim=1, device='cpu'):
     """Returns the k largest elements of the given input tensor along a given dimension.
 
     Parameters
@@ -71,8 +71,7 @@ def topk(A, k, dim=1):
     """
     if len(A.shape) == 1:
         dim = 0
-    tk = torch.topk(A.cuda(), k, dim=dim)
-    # print(A.cuda())
+    tk = torch.topk(A.to(device), k, dim=dim)
     return tk[0].cpu(), tk[1].cpu()
 
 
@@ -94,14 +93,14 @@ def bottomk_cpu(A, k, dim=1):
     return tk[0], tk[1]
 
 
-def bottomk_low_prec(A, k, dim=1, mode='half', sort_value=False):
+def bottomk_low_prec(A, k, dim=1, mode='half', sort_value=False, device='cpu'):
     # in lower precision
     if mode == 'half':
         # do conversion first
-        A_GPU = A.half().cuda()
+        A_GPU = A.half().to(device)
 
     else:
-        A_GPU = A.float().cuda()
+        A_GPU = A.float().to(device)
 
     bottomk_dist, bottomk_indices = bottomk(A_GPU, k + 1)
 
@@ -117,7 +116,7 @@ def bottomk_low_prec(A, k, dim=1, mode='half', sort_value=False):
     print("ambiguous indices", len(amb_indices))
 
     # recal_cdist = cdist_dist[amb_indices, :].double()
-    A_GPU_recal = A[amb_indices, :].cuda()
+    A_GPU_recal = A[amb_indices, :].to(device)
 
     _, bottomk_indices[amb_indices, :k] = bottomk(A_GPU_recal, k)
 
@@ -138,14 +137,14 @@ def bottomk_low_prec(A, k, dim=1, mode='half', sort_value=False):
         return bottomk_dist, bottomk_indices
 
 
-def topk_low_prec(A, k, dim=1, mode='half', sort_value=False):
+def topk_low_prec(A, k, dim=1, mode='half', sort_value=False, device='cpu'):
     # in lower precision
     if mode == 'half':
         # do conversion first
-        A_GPU = A.half().cuda()
+        A_GPU = A.half().to(device)
 
     else:
-        A_GPU = A.float().cuda()
+        A_GPU = A.float().to(device)
 
     print(A_GPU)
 
@@ -162,7 +161,7 @@ def topk_low_prec(A, k, dim=1, mode='half', sort_value=False):
 
     print("ambiguous indices", len(amb_indices))
 
-    A_GPU_recal = A[amb_indices, :].cuda()
+    A_GPU_recal = A[amb_indices, :].to(device)
     # recal_cdist = cdist_dist[amb_indices, :].double()
     _, topk_indices[amb_indices, :k] = topk(A_GPU_recal, k)
 
@@ -183,32 +182,9 @@ def topk_low_prec(A, k, dim=1, mode='half', sort_value=False):
         return topk_dist, topk_indices
 
 
-# # A = torch.randn(10000, 100).cuda().double()
-# A = torch.randn(10000, 100).cuda().float()
-# # A = torch.randn(10000, 100).cuda().half()
-# # B =torch.randn(10000, 100).cuda().half()
-# # B = torch.randn(10000, 100).cuda().float()
-# # C = torch.randn(10000, 100).cuda().float()
-# k = 10 
-# # A = torch.tensor([[1,2,3], [4,2,3], [1,2,0], [2,2,3]])
-
-# # print(bottomk(A, 2))
-
-# with LineProfiler(topk_low_prec) as prof:
-#     start = time.time()
-#     # bottomk_dist, bottomk_indices = bottomk_low_prec(A, k)
-#     # topk(A, k)
-#     topk_low_prec(A, k)
-#     # bottomk(A, k)
-#     end = time.time()
-#     print(end - start)
-# print(prof.display())
-
-# %%
-
-def intersec1d(t1_orig, t2_orig, assume_unique=False):
-    t1_orig = t1_orig.cuda()
-    t2_orig = t2_orig.cuda()
+def intersec1d(t1_orig, t2_orig, assume_unique=False, device='cpu'):
+    t1_orig = t1_orig.to(device)
+    t2_orig = t2_orig.to(device)
     # adapted from https://github.com/numpy/numpy/blob/v1.19.0/numpy/lib/arraysetops.py#L347-L441
     if assume_unique:
         aux = torch.cat((t1_orig, t2_orig))
@@ -268,11 +244,11 @@ def ecdf_multiple(X, device='cpu'):
     return y_tensor[argx_tensor].cpu()
 
 
-def svd_randomized(M, k=10):
+def svd_randomized(M, k=10, device='cpu'):
     # http://gregorygundersen.com/blog/2019/01/17/randomized-svd/
     # http://algorithm-interest-group.me/assets/slides/randomized_SVD.pdf
     n_samples, n_dims = M.shape[0], M.shape[1]
-    P = torch.randn([n_dims, k]).float().cuda()
+    P = torch.randn([n_dims, k]).float().to(device)
     M_P = torch.mm(M, P)
     Q, _ = torch.qr(M_P)
     B = torch.mm(Q.T, M)

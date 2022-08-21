@@ -21,7 +21,7 @@ def get_bounded_error(max_value, dimension, machine_eps=np.finfo(float).eps,
         return float(4 * dimension * (max_value ** 2) * factor)
 
 
-def neighbor_within_range_low_prec_float(X, range_threshold):
+def neighbor_within_range_low_prec_float(X, range_threshold, device='cpu'):
     n_samples, n_features = X.shape[0], X.shape[1]
 
     # get the error bound
@@ -29,7 +29,7 @@ def neighbor_within_range_low_prec_float(X, range_threshold):
         get_bounded_error(torch.max(X).cpu().numpy(), n_features))
 
     # calculate the cdist in lower precision
-    distance_mat = torch.cdist(X.cuda(), X.cuda()).cpu()
+    distance_mat = torch.cdist(X.to(device), X.to(device)).cpu()
 
     # selected_indice = torch.nonzero(distance_mat<= threshold, as_tuple=False)
 
@@ -82,9 +82,9 @@ def get_indices_clear_pairs(clear_pairs, sample_indice):
         torch.nonzero((clear_pairs[:, 0] == sample_indice), as_tuple=False), 1]
 
 
-def neighbor_within_range(X, range_threshold):
+def neighbor_within_range(X, range_threshold, device='cpu'):
     # calculate the cdist in lower precision
-    distance_mat = torch.cdist(X.cuda(), X.cuda()).cpu()
+    distance_mat = torch.cdist(X.to(device), X.to(device)).cpu()
     print(distance_mat)
     # identify the indice pairs
     clear_indices = torch.nonzero((distance_mat <= range_threshold),
@@ -92,7 +92,7 @@ def neighbor_within_range(X, range_threshold):
     return clear_indices
 
 
-def neighbor_within_range_low_prec(X, range_threshold):
+def neighbor_within_range_low_prec(X, range_threshold, device='cpu'):
     n_samples, n_features = X.shape[0], X.shape[1]
 
     # get the error bound
@@ -100,7 +100,7 @@ def neighbor_within_range_low_prec(X, range_threshold):
         get_bounded_error(torch.max(X).cpu().numpy(), n_features))
 
     # calculate the cdist in lower precision
-    distance_mat = torch.cdist(X.cuda().half(), X.cuda().half()).cpu()
+    distance_mat = torch.cdist(X.to(device).half(), X.to(device).half()).cpu()
 
     # selected_indice = torch.nonzero(distance_mat<= threshold, as_tuple=False)
 
@@ -147,7 +147,7 @@ def neighbor_within_range_low_prec(X, range_threshold):
     return clear_pairs
 
 
-def knn_batch_intermediate(A, B, k=5, p=2.0, batch_size=None):
+def knn_batch_intermediate(A, B, k=5, p=2.0, batch_size=None, device='cpu'):
     # this is the map step
     n_samples, n_features = A.shape[0], A.shape[1]
     n_distance = B.shape[0]
@@ -173,9 +173,10 @@ def knn_batch_intermediate(A, B, k=5, p=2.0, batch_size=None):
     for i, index_A in enumerate(batch_index_A):
         for j, index_B in enumerate(batch_index_B):
             # get the dist
-            cdist_mat_batch = torch.cdist(A[index_A[0]:index_A[1], :].cuda(),
-                                          B[index_B[0]:index_B[1], :].cuda(),
-                                          p=p)
+            cdist_mat_batch = torch.cdist(
+                A[index_A[0]:index_A[1], :].to(device),
+                B[index_B[0]:index_B[1], :].to(device),
+                p=p)
 
             # important, need to select from the batch index
             # otherwise the ind starts from 0 again
@@ -212,8 +213,8 @@ def get_knn_from_intermediate(intermediate_knn, k):
 def knn_batch(A, B, k=5, p=2.0, batch_size=None, device='cpu'):
     if batch_size is None:
         return knn_full(A, B, k, p, device)
-    intermediate_knn = knn_batch_intermediate(A.to(device), B.to(device), k, p,
-                                              batch_size)
+    intermediate_knn = knn_batch_intermediate(A, B, k, p,
+                                              batch_size, device)
     return get_knn_from_intermediate(intermediate_knn, k)
 
 
