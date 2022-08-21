@@ -1,6 +1,6 @@
-numpy>=1.13
-torch>=1.7
-scipy
-scikit_learn>=0.20
 mpmath
+numpy>=1.13
 pyod>=1.0.4
+scikit_learn>=0.21
+scipy
+torch>=1.7

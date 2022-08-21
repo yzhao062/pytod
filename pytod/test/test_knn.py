@@ -16,7 +16,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from pytod.models.knn import KNN
 from pytod.utils.data import generate_data
-
+from pytod.utils.utility import validate_device
 
 class TestKnn(unittest.TestCase):
     def setUp(self):
@@ -31,6 +31,11 @@ class TestKnn(unittest.TestCase):
         device = 'cpu'
         self.clf = KNN(contamination=self.contamination, device=device)
         self.clf.fit(self.X_train)
+
+        device = validate_device(0)
+        self.clf = KNN(contamination=self.contamination, device=device)
+        self.clf.fit(self.X_train)
+
 
     def test_parameters(self):
         assert (hasattr(self.clf, 'decision_scores_') and

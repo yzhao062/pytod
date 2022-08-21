@@ -16,6 +16,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from pytod.models.pca import PCA
 from pytod.utils.data import generate_data
+from pytod.utils.utility import validate_device
 
 
 class TestPCA(unittest.TestCase):
@@ -29,6 +30,10 @@ class TestPCA(unittest.TestCase):
             contamination=self.contamination, random_state=42)
 
         device = 'cpu'
+        self.clf = PCA(contamination=self.contamination, device=device)
+        self.clf.fit(self.X_train)
+
+        device = validate_device(0)
         self.clf = PCA(contamination=self.contamination, device=device)
         self.clf.fit(self.X_train)
 

@@ -14,11 +14,12 @@ from numpy.testing import assert_equal
 # if pyod is installed, no need to use the following line
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from pytod.models.hbos import HBOS
+from pytod.models.ecod import ECOD
 from pytod.utils.data import generate_data
 from pytod.utils.utility import validate_device
 
-class TestHBOS(unittest.TestCase):
+
+class TestECOD(unittest.TestCase):
     def setUp(self):
         self.n_train = 200
         self.n_test = 100
@@ -29,13 +30,12 @@ class TestHBOS(unittest.TestCase):
             contamination=self.contamination, random_state=42)
 
         device = 'cpu'
-        self.clf = HBOS(contamination=self.contamination, device=device)
+        self.clf = ECOD(contamination=self.contamination, device=device)
         self.clf.fit(self.X_train)
 
         device = validate_device(0)
-        self.clf = HBOS(contamination=self.contamination, device=device)
+        self.clf = ECOD(contamination=self.contamination, device=device)
         self.clf.fit(self.X_train)
-
 
     def test_parameters(self):
         assert (hasattr(self.clf, 'decision_scores_') and

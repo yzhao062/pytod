@@ -18,6 +18,9 @@
    :target: https://github.com/yzhao062/pytod/network
    :alt: GitHub forks
 
+.. image:: https://github.com/yzhao062/pytod/actions/workflows/testing.yml/badge.svg
+   :target: https://github.com/yzhao062/pytod/actions/workflows/testing.yml
+   :alt: testing
 
 .. image:: https://img.shields.io/github/license/yzhao062/pytod.svg
    :target: https://github.com/yzhao062/pytod/blob/master/LICENSE
@@ -31,9 +34,6 @@
 We propose **TOD**, a system for efficient and scalable outlier detection (OD) on distributed multi-GPU machines.
 A key idea behind TOD is *decomposing OD applications into basic tensor algebra operations for GPU acceleration*.
 
-**Authors**: TOD is developed by the same author(s) of the popular PyOD and PyGOD. Specifically, `Yue Zhao <https://www.andrew.cmu.edu/user/yuezhao2/>`_,
-`Prof. George Chen <http://www.andrew.cmu.edu/user/georgech/>`_, and `Prof. Zhihao Jia <https://cs.cmu.edu/~zhihaoj2>`_.
-**The code is being cleaned up and released. Please watch and star!**
 
 **Citing TOD**\ : Check out `the design paper <https://www.andrew.cmu.edu/user/yuezhao2/papers/22-preprint-tod.pdf>`_.
 If you use TOD in a scientific publication, we would appreciate
@@ -123,11 +123,12 @@ Alternatively, you could clone and run setup.py file:
 
 
 * Python 3.6+
+* mpmath
 * numpy>=1.13
 * torch>=1.7 (**it is safer if you install by yourself**)
 * scipy>=0.19.1
-* scikit_learn>=0.20.0
-* pyod (**for comparison**)
+* scikit_learn>=0.21
+* pyod>=1.0.4 (**for comparison**)
 
 ----
 
