@@ -184,7 +184,7 @@ def knn_batch_intermediate(A, B, k=5, p=2.0, batch_size=None, device='cpu'):
                 batch_size, 1)
             # print(batch_inds.shape)
 
-            bk = bottomk(cdist_mat_batch, k)
+            bk = bottomk(cdist_mat_batch, k, device)
             # we need a global indices here
             k_dist_mat[i * batch_size:(i + 1) * batch_size,
             j * k:(j + 1) * k] = bk[0]

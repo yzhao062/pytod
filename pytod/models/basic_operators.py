@@ -75,12 +75,12 @@ def topk(A, k, dim=1, device='cpu'):
     return tk[0].cpu(), tk[1].cpu()
 
 
-def bottomk(A, k, dim=1):
+def bottomk(A, k, dim=1, device='cpu'):
     if len(A.shape) == 1:
         dim = 0
     # tk = torch.topk(A * -1, k, dim=dim)
     # see parameter https://pytorch.org/docs/stable/generated/torch.topk.html
-    tk = torch.topk(A.cuda(), k, dim=dim, largest=False)
+    tk = torch.topk(A.to(device), k, dim=dim, largest=False)
     return tk[0].cpu(), tk[1].cpu()
 
 
