@@ -20,7 +20,7 @@ from pytod.utils.utility import validate_device
 
 # define the synthetic data here
 contamination = 0.1  # percentage of outliers
-n_train = 10000  # number of training points
+n_train = 100000  # number of training points
 n_features = 200
 k = 20
 batch_size = 30000
@@ -37,54 +37,64 @@ X_torch = torch.from_numpy(X).float()
 
 device = validate_device(0)
 
-key = 'KNN'
-start = time.time()
-clf = KNN(n_neighbors=20, batch_size=batch_size, device=device)
-clf.fit(X_torch, return_time=True)
-decision_scores = clf.decision_scores_
-decision_scores = np.nan_to_num(decision_scores)
-end = time.time()
-print('kNN total time', end - start)
-print('kNN GPU time', clf.gpu_time)
+def knn_measure():
+    key = 'KNN'
+    start = time.time()
+    clf = KNN(n_neighbors=20, batch_size=batch_size, device=device)
+    clf.fit(X_torch, return_time=True)
+    decision_scores = clf.decision_scores_
+    decision_scores = np.nan_to_num(decision_scores)
+    end = time.time()
+    print('kNN total time', end - start)
+    print('kNN GPU time', clf.gpu_time)
 
-key = 'HBOS'
-start = time.time()
-clf = HBOS(n_bins=50, alpha=0.1, device=device)
-clf.fit(X_torch, return_time=True)
-decision_scores = clf.decision_scores_
-decision_scores = np.nan_to_num(decision_scores)
-end = time.time()
-print('HBOS total time', end - start)
-print('HBOS GPU time', clf.gpu_time)
+def hbos_measure():
+    key = 'HBOS'
+    start = time.time()
+    clf = HBOS(n_bins=50, alpha=0.1, device=device)
+    clf.fit(X_torch, return_time=True)
+    decision_scores = clf.decision_scores_
+    decision_scores = np.nan_to_num(decision_scores)
+    end = time.time()
+    print('HBOS total time', end - start)
+    print('HBOS GPU time', clf.gpu_time)
 
-key = 'PCA'
-start = time.time()
-clf = PCA(n_components=5, device=device)
-clf.fit(X_torch, return_time=True)
-decision_scores = clf.decision_scores_
-decision_scores = np.nan_to_num(decision_scores)
-end = time.time()
-print('PCA total time', end - start)
-print('PCA GPU time', clf.gpu_time)
+def pca_measure():
+    key = 'PCA'
+    start = time.time()
+    clf = PCA(n_components=5, device=device)
+    clf.fit(X_torch, return_time=True)
+    decision_scores = clf.decision_scores_
+    decision_scores = np.nan_to_num(decision_scores)
+    end = time.time()
+    print('PCA total time', end - start)
+    print('PCA GPU time', clf.gpu_time)
 
-key = 'LOF'
-start = time.time()
-clf = LOF(n_neighbors=20, batch_size=batch_size, device=device)
-clf.fit(X_torch, return_time=True)
-decision_scores = clf.decision_scores_
-decision_scores = np.nan_to_num(decision_scores)
-end = time.time()
-print('LOF total time', end - start)
-print('LOF GPU time', clf.gpu_time)
+def lof_measure():
+    key = 'LOF'
+    start = time.time()
+    clf = LOF(n_neighbors=20, batch_size=batch_size, device=device)
+    clf.fit(X_torch, return_time=True)
+    decision_scores = clf.decision_scores_
+    decision_scores = np.nan_to_num(decision_scores)
+    end = time.time()
+    print('LOF total time', end - start)
+    print('LOF GPU time', clf.gpu_time)
 
-key = 'ABOD'
-start = time.time()
-clf = ABOD(n_neighbors=20, batch_size=batch_size, device=device)
-clf.fit(X_torch, return_time=True)
-decision_scores = clf.decision_scores_
-decision_scores = np.nan_to_num(decision_scores)
-end = time.time()
-print('ABOD total time', end - start)
-print('ABOD GPU time', clf.gpu_time)
+def abod_measure():
+    key = 'ABOD'
+    start = time.time()
+    clf = ABOD(n_neighbors=20, batch_size=batch_size, device=device)
+    clf.fit(X_torch, return_time=True)
+    decision_scores = clf.decision_scores_
+    decision_scores = np.nan_to_num(decision_scores)
+    end = time.time()
+    print('ABOD total time', end - start)
+    print('ABOD GPU time', clf.gpu_time)
 
+# knn_measure()
+# hbos_measure()
+# pca_measure()
+lof_measure()
+# abod_measure()
 
