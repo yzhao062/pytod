@@ -6,6 +6,7 @@ from mpmath import mp
 from pyod.utils.utility import get_list_diff
 
 from .basic_operators import bottomk
+from .basic_operators_batch import cdist_batch
 from .functional_operators import knn_full
 from ..utils.utility import get_batch_index
 
@@ -21,7 +22,8 @@ def get_bounded_error(max_value, dimension, machine_eps=np.finfo(float).eps,
         return float(4 * dimension * (max_value ** 2) * factor)
 
 
-def neighbor_within_range_low_prec_float(X, range_threshold, device='cpu'):
+def neighbor_within_range_low_prec_float(X, range_threshold, batch_size=None,
+                                         device='cpu'):
     n_samples, n_features = X.shape[0], X.shape[1]
 
     # get the error bound
@@ -29,80 +31,14 @@ def neighbor_within_range_low_prec_float(X, range_threshold, device='cpu'):
         get_bounded_error(torch.max(X).cpu().numpy(), n_features))
 
     # calculate the cdist in lower precision
-    distance_mat = torch.cdist(X.to(device), X.to(device)).cpu()
-
-    # selected_indice = torch.nonzero(distance_mat<= threshold, as_tuple=False)
-
-    # we can calculate diffence instead
-    # see code here
-    full_indices = np.arange(0, n_samples)
-
-    # identify the ambiguous indice pairs
-    amb_indices = torch.nonzero(
-        (distance_mat <= range_threshold + error_bound) &
-        (distance_mat >= range_threshold - error_bound), as_tuple=False)
-
-    print(amb_indices.shape)
-    print(torch.unique(amb_indices[:, 0]).shape)
-
-    # these are the indices of the samples with no ambiguity
-    clear_indices = get_list_diff(full_indices,
-                                  amb_indices[:, 0].cpu().numpy())
-
-    # find the matched samples 
-    clear_pairs = torch.nonzero(
-        distance_mat[clear_indices, :] <= range_threshold, as_tuple=False)
-    print('initial pairs', clear_pairs.shape)
-
-    # recalculate for the amb_indices
-    # get the samples for recalculation
-    amb_1 = X[amb_indices[:, 0], :]
-    amb_2 = X[amb_indices[:, 1], :]
-
-    pdist = torch.nn.PairwiseDistance(p=2)
-    amb_dist = pdist(amb_1, amb_2)
-
-    # finally return a 2-d tensor containing all the tensors
-    true_neigh_indices = torch.nonzero((amb_dist <= range_threshold),
-                                       as_tuple=True)
-    print(true_neigh_indices[0].shape)
-
-    clear_pairs = torch.cat(
-        (clear_pairs, amb_indices[true_neigh_indices[0], :]))
-    print('ultimate true pairs', clear_pairs.shape)
-
-    print('imprecision pairs correct:',
-          amb_indices.shape[0] - true_neigh_indices[0].shape[0])
-    return clear_pairs
-
-
-def get_indices_clear_pairs(clear_pairs, sample_indice):
-    # find pairs neighbors for specific samples
-    return clear_pairs[
-        torch.nonzero((clear_pairs[:, 0] == sample_indice), as_tuple=False), 1]
-
-
-def neighbor_within_range(X, range_threshold, device='cpu'):
-    # calculate the cdist in lower precision
-    distance_mat = torch.cdist(X.to(device), X.to(device)).cpu()
-    print(distance_mat)
-    # identify the indice pairs
-    clear_indices = torch.nonzero((distance_mat <= range_threshold),
-                                  as_tuple=False)
-    return clear_indices
-
-
-def neighbor_within_range_low_prec(X, range_threshold, device='cpu'):
-    n_samples, n_features = X.shape[0], X.shape[1]
-
-    # get the error bound
-    error_bound = float(
-        get_bounded_error(torch.max(X).cpu().numpy(), n_features))
-
-    # calculate the cdist in lower precision
-    distance_mat = torch.cdist(X.to(device).half(), X.to(device).half()).cpu()
-
-    # selected_indice = torch.nonzero(distance_mat<= threshold, as_tuple=False)
+    # distance_mat = torch.cdist(X.to(device).float(),
+    #                            X.to(device).float()).cpu()
+    if batch_size is None:
+        distance_mat = torch.cdist(X.to(device).float(),
+                                   X.to(device).float()).cpu()
+    else:
+        distance_mat = cdist_batch(X.float(), X.float(), batch_size=batch_size,
+                                   device=device)
 
     # we can calculate difference instead
     # see code here
@@ -113,17 +49,17 @@ def neighbor_within_range_low_prec(X, range_threshold, device='cpu'):
         (distance_mat <= range_threshold + error_bound) &
         (distance_mat >= range_threshold - error_bound), as_tuple=False)
 
-    print(amb_indices.shape)
-    print(torch.unique(amb_indices[:, 0]).shape)
+    # print(amb_indices.shape)
+    # print(torch.unique(amb_indices[:, 0]).shape)
 
     # these are the indices of the samples with no ambiguity
     clear_indices = get_list_diff(full_indices,
                                   amb_indices[:, 0].cpu().numpy())
 
-    # find the matched samples
+    # find the matched samples 
     clear_pairs = torch.nonzero(
         distance_mat[clear_indices, :] <= range_threshold, as_tuple=False)
-    print('initial pairs', clear_pairs.shape)
+    # print('initial pairs', clear_pairs.shape)
 
     # recalculate for the amb_indices
     # get the samples for recalculation
@@ -136,14 +72,95 @@ def neighbor_within_range_low_prec(X, range_threshold, device='cpu'):
     # finally return a 2-d tensor containing all the tensors
     true_neigh_indices = torch.nonzero((amb_dist <= range_threshold),
                                        as_tuple=True)
-    print(true_neigh_indices[0].shape)
+    # print(true_neigh_indices[0].shape)
 
     clear_pairs = torch.cat(
         (clear_pairs, amb_indices[true_neigh_indices[0], :]))
-    print('ultimate true pairs', clear_pairs.shape)
+    # print('ultimate true pairs', clear_pairs.shape)
 
-    print('imprecision pairs correct:',
-          amb_indices.shape[0] - true_neigh_indices[0].shape[0])
+    # print('imprecision pairs correct:',
+    #       amb_indices.shape[0] - true_neigh_indices[0].shape[0])
+    return clear_pairs
+
+
+def get_indices_clear_pairs(clear_pairs, sample_indice):
+    # find pairs neighbors for specific samples
+    return clear_pairs[
+        torch.nonzero((clear_pairs[:, 0] == sample_indice), as_tuple=False), 1]
+
+
+def neighbor_within_range(X, range_threshold, batch_size=None, device='cpu'):
+    # calculate the cdist in original precision
+    if batch_size is None:
+        distance_mat = torch.cdist(X.to(device), X.to(device)).cpu()
+    else:
+        distance_mat = cdist_batch(X, X, batch_size=batch_size, device=device)
+
+    # print(distance_mat)
+    # identify the indice pairs
+    clear_indices = torch.nonzero((distance_mat <= range_threshold),
+                                  as_tuple=False)
+    return clear_indices
+
+
+def neighbor_within_range_low_prec(X, range_threshold, batch_size=None,
+                                   device='cpu'):
+    n_samples, n_features = X.shape[0], X.shape[1]
+
+    # get the error bound
+    error_bound = float(
+        get_bounded_error(torch.max(X).cpu().numpy(), n_features))
+
+    # calculate the cdist in lower precision
+    # distance_mat = torch.cdist(X.to(device).half(), X.to(device).half()).cpu()
+
+    if batch_size is None:
+        distance_mat = torch.cdist(X.to(device).half(),
+                                   X.to(device).half()).cpu()
+    else:
+        distance_mat = cdist_batch(X.half(), X.half(), batch_size=batch_size,
+                                   device=device).cpu()
+
+    # we can calculate difference instead
+    # see code here
+    full_indices = np.arange(0, n_samples)
+
+    # identify the ambiguous indice pairs
+    amb_indices = torch.nonzero(
+        (distance_mat <= range_threshold + error_bound) &
+        (distance_mat >= range_threshold - error_bound), as_tuple=False)
+
+    # print(amb_indices.shape)
+    # print(torch.unique(amb_indices[:, 0]).shape)
+
+    # these are the indices of the samples with no ambiguity
+    clear_indices = get_list_diff(full_indices,
+                                  amb_indices[:, 0].cpu().numpy())
+
+    # find the matched samples
+    clear_pairs = torch.nonzero(
+        distance_mat[clear_indices, :] <= range_threshold, as_tuple=False)
+    # print('initial pairs', clear_pairs.shape)
+
+    # recalculate for the amb_indices
+    # get the samples for recalculation
+    amb_1 = X[amb_indices[:, 0], :]
+    amb_2 = X[amb_indices[:, 1], :]
+
+    pdist = torch.nn.PairwiseDistance(p=2)
+    amb_dist = pdist(amb_1, amb_2)
+
+    # finally return a 2-d tensor containing all the tensors
+    true_neigh_indices = torch.nonzero((amb_dist <= range_threshold),
+                                       as_tuple=True)
+    # print(true_neigh_indices[0].shape)
+
+    clear_pairs = torch.cat(
+        (clear_pairs, amb_indices[true_neigh_indices[0], :]))
+    # print('ultimate true pairs', clear_pairs.shape)
+
+    # print('imprecision pairs correct:',
+    #       amb_indices.shape[0] - true_neigh_indices[0].shape[0])
     return clear_pairs
 
 
@@ -152,7 +169,7 @@ def knn_batch_intermediate(A, B, k=5, p=2.0, batch_size=None, device='cpu'):
     n_samples, n_features = A.shape[0], A.shape[1]
     n_distance = B.shape[0]
 
-    if batch_size >= n_samples:
+    if batch_size >= n_samples or batch_size is None:
         return knn_full(A, B, k, p)
 
     batch_index_A = get_batch_index(n_samples, batch_size)

@@ -145,3 +145,33 @@ def get_prn(y, y_pred):
     check_consistent_length(y, y_pred)
 
     return np.round(precision_n_scores(y, y_pred), decimals=4)
+
+
+def Standardizer(X_train, mean=None, std=None, return_mean_std=False):
+    """standardize the data with zero mean and unit variance.
+
+    Parameters
+    ----------
+    X_train
+    mean
+    std
+    return_mean_std
+
+    Returns
+    -------
+
+    """
+    if mean is None:
+        mean = torch.mean(X_train, axis=0)
+        std = torch.std(X_train, axis=0)
+
+        assert (mean.shape[0] == X_train.shape[1])
+        assert (std.shape[0] == X_train.shape[1])
+
+    X_train_norm = (X_train - mean) / std
+    assert (X_train_norm.shape == X_train.shape)
+
+    if return_mean_std:
+        return X_train_norm, mean, std
+    else:
+        return X_train_norm

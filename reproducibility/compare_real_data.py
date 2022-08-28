@@ -4,6 +4,10 @@
 # Author: Yue Zhao <zhaoy@cmu.edu>
 # License: BSD 2 clause
 
+import warnings
+
+warnings.filterwarnings("ignore")
+
 import os
 import sys
 import time
@@ -15,9 +19,7 @@ from pyod.models.hbos import HBOS as PyOD_HBOS
 from pyod.models.knn import KNN as PyOD_KNN
 from pyod.models.lof import LOF as PyOD_LOF
 from pyod.models.pca import PCA as PyOD_PCA
-from pyod.utils.utility import precision_n_scores
 from scipy.io import loadmat
-from sklearn.metrics import roc_auc_score
 
 # temporary solution for relative imports in case pyod is not installed
 # if pyod is installed, no need to use the following line
@@ -30,39 +32,19 @@ from pytod.models.knn import KNN
 from pytod.models.pca import PCA
 from pytod.models.hbos import HBOS
 from pytod.utils.utility import validate_device
-
-
-def get_roc(y, y_pred):
-    from sklearn.utils import column_or_1d
-    from sklearn.utils import check_consistent_length
-    y = column_or_1d(y)
-    y_pred = column_or_1d(y_pred)
-    check_consistent_length(y, y_pred)
-
-    return np.round(roc_auc_score(y, y_pred), decimals=4)
-
-
-def get_prn(y, y_pred):
-    from sklearn.utils import column_or_1d
-    from sklearn.utils import check_consistent_length
-    y = column_or_1d(y)
-    y_pred = column_or_1d(y_pred)
-    check_consistent_length(y, y_pred)
-
-    return np.round(precision_n_scores(y, y_pred), decimals=4)
-
+from pytod.utils.data import get_roc, get_prn
 
 # please select multiple data
 mat_file_list = [
     # 'annthyroid.mat',
     # 'arrhythmia.mat',
     # 'breastw.mat',
-    # 'glass.mat',
+    'glass.mat',
     # 'ionosphere.mat',
     # 'letter.mat',
     # 'lympho.mat',
     # 'mammography.mat',
-    'mnist.mat',
+    # 'mnist.mat',
     # 'musk.mat',
     # 'optdigits.mat',
     # 'pendigits.mat',

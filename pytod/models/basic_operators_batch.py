@@ -3,11 +3,9 @@
 Created on Thu Jan 14 21:44:34 2021
 """
 
-import numpy as np
 import torch
 
-from .basic_operators import cdist_s
-from .basic_operators import topk, bottomk, intersec1d
+from .basic_operators import topk, bottomk, intersec1d, cdist
 from ..utils.utility import get_batch_index
 
 
@@ -47,9 +45,12 @@ def cdist_batch(A, B, p=2.0, batch_size=None, device='cpu'):
     for i, index_A in enumerate(batch_index_A):
         for j, index_B in enumerate(batch_index_B):
             cdist_mat[index_A[0]:index_A[1], index_B[0]:index_B[1]] = \
-                cdist_s(A[index_A[0]:index_A[1], :].to(device),
-                        B[index_B[0]:index_B[1], :].to(device)
-                        ).cpu()
+                cdist(A[index_A[0]:index_A[1], :],
+                      B[index_B[0]:index_B[1], :],
+                      device=device).cpu()
+            # cdist_s(A[index_A[0]:index_A[1], :].to(device),
+            #         B[index_B[0]:index_B[1], :].to(device)
+            #         ).cpu()
     return cdist_mat
 
 

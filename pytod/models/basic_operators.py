@@ -32,23 +32,23 @@ def cdist(a, b=None, p=2, device='cpu'):
         return torch_cdist(a.to(device), b.to(device), p=p)
 
 
-def cdist_s(a, b):
-    """Memory saving version of cdist
-
-    Parameters
-    ----------
-    a
-    b
-
-    Returns
-    -------
-
-    """
-    norm_a = torch.norm(a, dim=1).reshape(a.shape[0], 1)
-    norm_b = torch.norm(b, dim=1).reshape(1, b.shape[0])
-
-    w = norm_a ** 2 + norm_b ** 2 - 2 * torch.matmul(a, b.T)
-    return torch.sqrt(w)
+# def cdist_s(a, b):
+#     """Memory saving version of cdist
+#
+#     Parameters
+#     ----------
+#     a
+#     b
+#
+#     Returns
+#     -------
+#
+#     """
+#     norm_a = torch.norm(a, dim=1).reshape(a.shape[0], 1)
+#     norm_b = torch.norm(b, dim=1).reshape(1, b.shape[0])
+#
+#     w = norm_a ** 2 + norm_b ** 2 - 2 * torch.matmul(a, b.T)
+#     return torch.sqrt(w)
 
 
 def topk(A, k, dim=1, device='cpu'):
