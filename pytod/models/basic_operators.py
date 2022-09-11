@@ -52,7 +52,7 @@ def cdist(a, b=None, p=2, device='cpu'):
 
 
 def topk(A, k, dim=1, device='cpu'):
-    """Returns the k largest elements of the given input tensor along a given dimension.
+    """Returns the k the largest elements of the given input tensor along a given dimension.
 
     Parameters
     ----------
