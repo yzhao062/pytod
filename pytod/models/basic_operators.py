@@ -8,9 +8,6 @@
 import torch
 from torch import cdist as torch_cdist
 
-# disable autograd since no grad is needed
-torch.set_grad_enabled(False)
-
 
 def cdist(a, b=None, p=2, device='cpu'):
     """Basic cdist without using batching
