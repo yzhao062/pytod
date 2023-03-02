@@ -8,9 +8,6 @@
 import torch
 from torch import cdist as torch_cdist
 
-# disable autograd since no grad is needed
-torch.set_grad_enabled(False)
-
 
 def cdist(a, b=None, p=2, device='cpu'):
     """Basic cdist without using batching
@@ -268,7 +265,12 @@ def histt(a, bins=10, density=True, device='cpu'):
     hist = torch.histc(a, bins=bins)
     # normalize histogram to sum to 1
     # hist = torch.true_divide(hist, hist.sum())
-    bin_edges = torch.linspace(a.min(), a.max(), steps=bins + 1).to(device)
+    first_edge = a.min()
+    last_edge = a.max()
+    if first_edge == last_edge:  # Prevent NaNs during divide. Follows np.histogram logic.
+        first_edge = first_edge - 0.5
+        last_edge = last_edge + 0.5
+    bin_edges = torch.linspace(first_edge, last_edge, steps=bins + 1).to(device)
     if density:
         hist_sum = hist.sum()
         db = diff(bin_edges).to(device)
