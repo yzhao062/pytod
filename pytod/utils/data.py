@@ -45,7 +45,7 @@ def generate_data(n_train=1000, n_test=500, n_features=2, contamination=0.1,
         by `np.random`.
 
     n_nan : int
-        The number of values that are missing (np.NaN). Defaults to zero.
+        The number of values that are missing (np.nan). Defaults to zero.
 
     n_inf : int
         The number of values that are infinite. (np.infty). Defaults to zero.
